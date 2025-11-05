@@ -1,16 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Coolo Games</title>
     <style>
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            margin: 0;
+            padding: 24px;
+            background: #fafafa;
+            color: #111;
+        }
         .header-box {
             background-color: #40005e;
             color: white;
-            padding: 12px;  
+            padding: 12px;
             text-align: center;
+            border-radius: 6px;
+        }
+
+        /* center grid of boxes */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 120px);
+            gap: 16px;
+            justify-content: center;
+             align-items: center;
+            margin: 48px 0;
+        }
+
+        .game-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 120px;
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            transition: transform .12s ease, box-shadow .12s ease, background .12s;
+        }
+        .game-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.32);
+            background: #111;
+        }
+
+        /* responsive: collapse to fewer columns on small screens */
+        @media (max-width: 800px) {
+            .games-grid { grid-template-columns: repeat(3, 1fr); }
+             }
+        @media (max-width: 480px) {
+            .games-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .game-box { height: 92px; font-size: 22px; }
         }
     </style>
-    <h1 class="header-box">Coolo Games i madeee</h1>
+</head>
+<body>
+    <h1 class="header-box">Coolo Games I made</h1>
+
+    <main class="games-grid" aria-label="Games list">
+        <a class="game-box" href="cursedponggame.html" role="button" aria-label="Game 1">1</a>
+        <a class="game-box" href="game2.html" role="button" aria-label="Game 2">2</a>
+        <a class="game-box" href="game3.html" role="button" aria-label="Game 3">3</a>
+        <a class="game-box" href="game4.html" role="button" aria-label="Game 4">4</a>
+        <a class="game-box" href="game5.html" role="button" aria-label="Game 5">5</a>
+    </main>
+</body>
 </html>
