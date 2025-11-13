@@ -164,7 +164,7 @@ var Game = {
             this.ball.moveX = DIRECTRION.RIGHT;
             var hit = (this.ball.y + this.ball.height/2) - (this.left.y + this.left.height/2);
             this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
-            this.ball.speed += 0.3;
+            this.ball.speed += 1.1;
             this.lastonehit='left';
         }
         // right paddle collision
@@ -172,7 +172,7 @@ var Game = {
             this.ball.moveX = DIRECTRION.LEFT;
             var hit2 = (this.ball.y + this.ball.height/2) - (this.right.y + this.right.height/2);
             this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
-            this.ball.speed += 0.3;
+            this.ball.speed += 1.1;
             this.lastonehit='right';
         }
 
