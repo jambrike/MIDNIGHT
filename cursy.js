@@ -10,7 +10,7 @@ var rounds = [5,5,3,3,2]
 var colours = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#33FFF5']// levels stuff stupid anyway
 
 var Ball = {
-    new: function(incrementSpeed) {
+    new: function(incrementSpeed) {}
         return {
             width:18,
             height:18,
@@ -31,7 +31,7 @@ var Robot = {
             x: side === 'left' ? 150 : this.canvasWidth - 150,
             y: (this.canvasHeight / 2) - 35,
             score: 0,
-            speed: 14
+            speed: 12 
         };
     }
 }
@@ -202,12 +202,17 @@ var Game = {
 
 
     stopadhpowerup: function() {
-        var size = 18;
+        var size = 32;
+        var margin = 24;
+        var minX = this.left.x + this.left.width + margin;
+        var maxX = this.right.x - margin - size;
         this.powerup = {
             x: Math.random() * (this.canvasWidth - size - 80) + 40,
             y: Math.random() * (this.canvasHeight - size - 40) + 20,
             size: size,
             expiresAt: performance.now() + 5000
+         
+    
         };
     },
 
