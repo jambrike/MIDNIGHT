@@ -206,6 +206,9 @@ var Game = {
         var margin = 24;
         var minX = this.left.x + this.left.width + margin;
         var maxX = this.right.x - margin - size;
+        var x = minX + Math.random() * (maxX - minX);
+        var y = margin + Math.random() * (this.canvasHeight - margin * 2 - size);
+
         this.powerup = {
             x: Math.random() * (this.canvasWidth - size - 80) + 40,
             y: Math.random() * (this.canvasHeight - size - 40) + 20,
