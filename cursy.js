@@ -31,7 +31,7 @@ var Robot = {
             x: side === 'left' ? 150 : this.canvasWidth - 150,
             y: (this.canvasHeight / 2) - 35,
             score: 0,
-            speed: 8
+            speed: 14
         };
     }
 }
