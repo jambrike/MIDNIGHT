@@ -166,7 +166,7 @@ var Game = {
             var hit = (this.ball.y + this.ball.height/2) - (this.left.y + this.left.height/2);
             this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.7; // lowered from 0.8
+                this.ball.speed += 0.65; // lowered from 0.8
             }
             this.lastonehit='left';
         }
@@ -176,7 +176,7 @@ var Game = {
             var hit2 = (this.ball.y + this.ball.height/2) - (this.right.y + this.right.height/2);
             this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.7; // lowered from 0.8
+                this.ball.speed += 0.65; // lowered from 0.8
             }
             this.lastonehit='right';
         }
@@ -207,7 +207,7 @@ var Game = {
 
 
     stopadhpowerup: function() {
-        var size = 26;
+        var size = 29.2;
         var margin = 24;
         var minX = this.left.x + this.left.width + margin;
         var maxX = this.right.x - margin - size;
@@ -230,7 +230,7 @@ var Game = {
     resetBall: function(lastScored) {
         this.ball.x = (this.canvasWidth / 2) - (this.ball.width / 2);
         this.ball.y = (this.canvasHeight / 2) - (this.ball.height / 2);
-        this.ball.speed = 12;
+        this.ball.speed = 10.1; //
         var serveLeft = lastScored === 'left' ? DIRECTRION.RIGHT : DIRECTRION.LEFT;
         if (!lastScored) serveLeft = (Math.random() > 0.5) ? DIRECTRION.LEFT : DIRECTRION.RIGHT;
         this.ball.moveX = serveLeft;
@@ -295,5 +295,6 @@ var Game = {
 window.addEventListener('load', function() {
     if (document.getElementById('gameCanvas')) {
         Game.initialize();
+        //cant stop at 299 lines cant stop goof song aswell
     }
 });
