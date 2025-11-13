@@ -31,7 +31,7 @@ var Robot = {
             x: side === 'left' ? 150 : this.canvasWidth - 150,
             y: (this.canvasHeight / 2) - 35,
             score: 0,
-            speed: 14
+            speed: 12 
         };
     }
 }
@@ -60,6 +60,7 @@ var Game = {
         this.leftfroze=0
         this.rightfroze=0
         this.lastonehit=null;
+        this.gameStartTime = performance.now(); // track when game started
 
 
         // file input to pick image for the ball
@@ -164,7 +165,10 @@ var Game = {
             this.ball.moveX = DIRECTRION.RIGHT;
             var hit = (this.ball.y + this.ball.height/2) - (this.left.y + this.left.height/2);
             this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
-            this.ball.speed += 1.1;
+            // only speed up if under 25 seconds
+            if (performance.now() - this.gameStartTime < 25000) {
+                this.ball.speed += 0.8;
+            }
             this.lastonehit='left';
         }
         // right paddle collision
@@ -172,7 +176,10 @@ var Game = {
             this.ball.moveX = DIRECTRION.LEFT;
             var hit2 = (this.ball.y + this.ball.height/2) - (this.right.y + this.right.height/2);
             this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
-            this.ball.speed += 1.1;
+            // only speed up if under 25 seconds
+            if (performance.now() - this.gameStartTime < 25000) {
+                this.ball.speed += 0.8;
+            }
             this.lastonehit='right';
         }
 
@@ -202,7 +209,7 @@ var Game = {
 
 
     stopadhpowerup: function() {
-        var size = 32;
+        var size = 26;
         var margin = 24;
         var minX = this.left.x + this.left.width + margin;
         var maxX = this.right.x - margin - size;
@@ -225,7 +232,7 @@ var Game = {
     resetBall: function(lastScored) {
         this.ball.x = (this.canvasWidth / 2) - (this.ball.width / 2);
         this.ball.y = (this.canvasHeight / 2) - (this.ball.height / 2);
-        this.ball.speed = 7;
+        this.ball.speed = 14;
         var serveLeft = lastScored === 'left' ? DIRECTRION.RIGHT : DIRECTRION.LEFT;
         if (!lastScored) serveLeft = (Math.random() > 0.5) ? DIRECTRION.LEFT : DIRECTRION.RIGHT;
         this.ball.moveX = serveLeft;
