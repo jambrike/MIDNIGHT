@@ -10,7 +10,7 @@ var rounds = [5,5,3,3,2]
 var colours = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#33FFF5']// levels stuff stupid anyway
 
 var Ball = {
-    new: function(incrementSpeed) {}
+    new: function(incrementSpeed) {
         return {
             width:18,
             height:18,
