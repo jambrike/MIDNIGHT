@@ -18,7 +18,7 @@ var Ball = {
             y: (this.canvasHeight / 2) - 9,
             moveX: DIRECTRION.IDLE,
             moveY: DIRECTRION.IDLE,
-            speed: incrementSpeed || 23
+            speed: incrementSpeed || 22
         };
     }
 }
@@ -165,9 +165,8 @@ var Game = {
             this.ball.moveX = DIRECTRION.RIGHT;
             var hit = (this.ball.y + this.ball.height/2) - (this.left.y + this.left.height/2);
             this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
-            // only speed up if under 25 seconds
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.8;
+                this.ball.speed += 0.3; // lowered from 0.8
             }
             this.lastonehit='left';
         }
@@ -176,9 +175,8 @@ var Game = {
             this.ball.moveX = DIRECTRION.LEFT;
             var hit2 = (this.ball.y + this.ball.height/2) - (this.right.y + this.right.height/2);
             this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
-            // only speed up if under 25 seconds
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.8;
+                this.ball.speed += 0.3; // lowered from 0.8
             }
             this.lastonehit='right';
         }
@@ -232,7 +230,7 @@ var Game = {
     resetBall: function(lastScored) {
         this.ball.x = (this.canvasWidth / 2) - (this.ball.width / 2);
         this.ball.y = (this.canvasHeight / 2) - (this.ball.height / 2);
-        this.ball.speed = 14;
+        this.ball.speed = 8; // lowered from 14
         var serveLeft = lastScored === 'left' ? DIRECTRION.RIGHT : DIRECTRION.LEFT;
         if (!lastScored) serveLeft = (Math.random() > 0.5) ? DIRECTRION.LEFT : DIRECTRION.RIGHT;
         this.ball.moveX = serveLeft;
