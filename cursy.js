@@ -18,7 +18,7 @@ var Ball = {
             y: (this.canvasHeight / 2) - 9,
             moveX: DIRECTRION.IDLE,
             moveY: DIRECTRION.IDLE,
-            speed: incrementSpeed || 20
+            speed: incrementSpeed || 19
         };
     }
 }
@@ -210,12 +210,10 @@ var Game = {
         var y = margin + Math.random() * (this.canvasHeight - margin * 2 - size);
 
         this.powerup = {
-            x: Math.random() * (this.canvasWidth - size - 80) + 40,
-            y: Math.random() * (this.canvasHeight - size - 40) + 20,
+            x: x,
+            y: y,
             size: size,
-            expiresAt: performance.now() + 5000
-         
-    
+            expiresAt: performance.now() + 7000
         };
     },
 
