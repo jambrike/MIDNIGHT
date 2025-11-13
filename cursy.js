@@ -7,7 +7,7 @@ var DIRECTRION = {
 };
 
 var rounds = [5,5,3,3,2]
-var colours = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#33FFF5']
+var colours = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#33FFF5']// levels stuff stupid anyway
 
 var Ball = {
     new: function(incrementSpeed) {
@@ -18,7 +18,7 @@ var Ball = {
             y: (this.canvasHeight / 2) - 9,
             moveX: DIRECTRION.IDLE,
             moveY: DIRECTRION.IDLE,
-            speed: incrementSpeed || 7
+            speed: incrementSpeed || 20
         };
     }
 }
@@ -49,13 +49,18 @@ var Game = {
         this.left = Robot.new.call(this, 'left');
         this.right = Robot.new.call(this, 'right');
 
-        // image for ball (null = draw fallback rectangle)
         this.ballImage = null;
 
-        // controls
         this.keys = {};
         window.addEventListener('keydown', (e) => { this.keys[e.key.toLowerCase()] = true; });
         window.addEventListener('keyup', (e) => { this.keys[e.key.toLowerCase()] = false; });
+        
+        this.powerup=null;
+        this.nextpowerupin = performance.now() + 6500;
+        this.leftfroze=0
+        this.rightfroze=0
+        this.lastonehit=null;
+
 
         // file input to pick image for the ball
         var input = document.getElementById('ballImageInput');
@@ -66,11 +71,9 @@ var Game = {
                 var img = new Image();
                 var url = URL.createObjectURL(file);
                 img.onload = () => {
-                    // use the image and resize the ball to a reasonable size
                     this.ballImage = img;
                     var size = Math.max(24, Math.min(72, Math.max(img.width, img.height)));
                     this.ball.width = this.ball.height = size;
-                    // free the object URL
                     URL.revokeObjectURL(url);
                 };
                 img.src = url;
@@ -81,17 +84,14 @@ var Game = {
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
                 this.ballImage = null;
-                // restore default size
                 this.ball.width = this.ball.height = 18;
                 if (input) input.value = '';
             });
         }
 
-        // serve on click or space
         this.isRunning = true;
         this.resetBall();
 
-        // start loop
         this._lastTime = performance.now();
         requestAnimationFrame(this.loop.bind(this));
     },
@@ -108,18 +108,32 @@ var Game = {
     },
 
     update: function(dt) {
-        // player controls (left paddle: w/s or arrow keys)
+     if (!this.frozen('left')) {
+
         if (this.keys['w'] || this.keys['arrowup']) {
             this.left.y -= this.left.speed * dt;
         }
         if (this.keys['s'] || this.keys['arrowdown']) {
             this.left.y += this.left.speed * dt;
         }
-        // keep paddles in bounds
         this.left.y = Math.max(0, Math.min(this.canvasHeight - this.left.height, this.left.y));
         this.right.y = Math.max(0, Math.min(this.canvasHeight - this.right.height, this.right.y));
 
+        //power up spwaner
+        var now = performance.now();
+        if (!this.powerup && now > this.nextpowerupin) {
+            this.stopadhpowerup();
+        }
+        if (this.powerup && now > this.powerup.expiresAt) {
+            this.powerup = null;
+            this.nextpowerupin = now + 6000;
+        }
+
+        
+
         // AI bit for right paddle
+        if (!this.frozen('right')) {
+
         var target = this.ball.y - (this.right.height - this.ball.height) / 2;
         if (this.right.y + this.right.height/2 < this.ball.y) {
             this.right.y += this.right.speed * 0.85 * dt;
@@ -127,7 +141,6 @@ var Game = {
             this.right.y -= this.right.speed * 0.85 * dt;
         }
 
-        // move ball
         if (this.ball.moveX === DIRECTRION.LEFT) this.ball.x -= this.ball.speed * dt;
         if (this.ball.moveX === DIRECTRION.RIGHT) this.ball.x += this.ball.speed * dt;
         if (this.ball.moveY === DIRECTRION.UP) this.ball.y -= this.ball.speed * dt;
@@ -148,24 +161,37 @@ var Game = {
             return !(b.x > p.x + p.width || b.x + b.width < p.x || b.y > p.y + p.height || b.y + b.height < p.y);
         }
 
+        stopadhpowerup: function() {
+            var size = 18;
+            this.powerup = {
+                x: Math.random() * (this.canvasWidth - size - 80) + 40,
+                y: Math.random() * (this.canvasHeight - size - 40) + 20,
+                size: size,
+                disappearAt: performance.now() + 5000, //gets rid of it
+            };
+        }
+        frozen:function(side) {
+            var now = performance.now();
+            return side === 'left' ? now < this.leftfroze : now < this.rightfroze;
+        }
+
         // left paddle collision
         if (intersects(this.ball, this.left) && this.ball.moveX === DIRECTRION.LEFT) {
             this.ball.moveX = DIRECTRION.RIGHT;
-            // change vertical direction based on hit position
             var hit = (this.ball.y + this.ball.height/2) - (this.left.y + this.left.height/2);
             this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
             this.ball.speed += 0.3;
+            this.lastonehit='left';
         }
-
         // right paddle collision
         if (intersects(this.ball, this.right) && this.ball.moveX === DIRECTRION.RIGHT) {
             this.ball.moveX = DIRECTRION.LEFT;
             var hit2 = (this.ball.y + this.ball.height/2) - (this.right.y + this.right.height/2);
             this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
             this.ball.speed += 0.3;
+            this.lastonehit='right';
         }
 
-        // scoring
         if (this.ball.x + this.ball.width < 0) {
             this.right.score++;
             this.resetBall('right');
@@ -174,16 +200,26 @@ var Game = {
             this.left.score++;
             this.resetBall('left');
         }
+        if (this.powerup) {
+           var p = this.powerup;
+           if (intersects(this.ball, {x: p.x, y: p.y, width: p.size, height: p.size})) {
+               // apply powerup effect
+               if (this.lastonehit==='left') {
+                   this.rightfroze = performance.now() + 3000;
+               } else if (this.lastonehit==='right') {
+                   this.leftfroze = performance.now() + 3000; 
+               }
+               this.powerup = null;
+               this.nextpowerupin = now + 6000;
+           }
+        }
     },
 
     resetBall: function(lastScored) {
-        // place ball center
         this.ball.x = (this.canvasWidth / 2) - (this.ball.width / 2);
         this.ball.y = (this.canvasHeight / 2) - (this.ball.height / 2);
         this.ball.speed = 7;
-        // direction: serve towards player who conceded (so lastScored is side that scored)
         var serveLeft = lastScored === 'left' ? DIRECTRION.RIGHT : DIRECTRION.LEFT;
-        // if no lastScored, random
         if (!lastScored) serveLeft = (Math.random() > 0.5) ? DIRECTRION.LEFT : DIRECTRION.RIGHT;
         this.ball.moveX = serveLeft;
         this.ball.moveY = (Math.random() > 0.5) ? DIRECTRION.UP : DIRECTRION.DOWN;
@@ -193,11 +229,9 @@ var Game = {
         var ctx = this.context;
         ctx.clearRect(0,0,this.canvasWidth,this.canvasHeight);
 
-        // background
         ctx.fillStyle = '#fafafa';
         ctx.fillRect(0,0,this.canvasWidth,this.canvasHeight);
 
-        // center dashed line
         ctx.strokeStyle = '#ddd';
         ctx.setLineDash([8, 8]);
         ctx.beginPath();
@@ -206,7 +240,6 @@ var Game = {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // paddles
         ctx.fillStyle = '#000';
         ctx.fillRect(this.left.x, this.left.y, this.left.width, this.left.height);
         ctx.fillRect(this.right.x, this.right.y, this.right.width, this.right.height);
@@ -225,21 +258,28 @@ var Game = {
             ctx.fillRect(this.ball.x, this.ball.y, this.ball.width, this.ball.height);
         }
 
-        // scores
         ctx.fillStyle = '#111';
         ctx.font = '28px system-ui, Arial';
         ctx.textAlign = 'center';
         ctx.fillText(this.left.score, this.canvasWidth * 0.25, 40);
         ctx.fillText(this.right.score, this.canvasWidth * 0.75, 40);
 
-        // instructions
         ctx.font = '14px system-ui, Arial';
         ctx.textAlign = 'left';
-        ctx.fillText('W/S or ↑/↓ to move', 12, this.canvasHeight - 12);
+        ctx.fillText('try to get to 20!', 12, this.canvasHeight - 12);
+        // draw powerup
+        if (this.powerup) {
+            var p = this.powerup;
+            ctx.save();
+            ctx.translate(p.x + p.size/2, p.y + p.size/2);
+            ctx.rotate(Math.PI / 4);
+            ctx.fillStyle = '#33AAFF';
+            ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+            ctx.restore();
+        }
     }
 };
-
-// start when DOM ready
+// start when page loads
 window.addEventListener('load', function() {
     if (document.getElementById('gameCanvas')) {
         Game.initialize();
