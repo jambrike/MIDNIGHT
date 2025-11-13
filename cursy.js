@@ -119,7 +119,7 @@ var Game = {
         this.left.y = Math.max(0, Math.min(this.canvasHeight - this.left.height, this.left.y));
         this.right.y = Math.max(0, Math.min(this.canvasHeight - this.right.height, this.right.y));
 
-        //power up spwaner
+        // power up spawner
         var now = performance.now();
         if (!this.powerup && now > this.nextpowerupin) {
             this.stopadhpowerup();
@@ -129,16 +129,14 @@ var Game = {
             this.nextpowerupin = now + 6000;
         }
 
-        
-
         // AI bit for right paddle
         if (!this.frozen('right')) {
-
-        var target = this.ball.y - (this.right.height - this.ball.height) / 2;
-        if (this.right.y + this.right.height/2 < this.ball.y) {
-            this.right.y += this.right.speed * 0.85 * dt;
-        } else if (this.right.y + this.right.height/2 > this.ball.y) {
-            this.right.y -= this.right.speed * 0.85 * dt;
+            var target = this.ball.y - (this.right.height - this.ball.height) / 2;
+            if (this.right.y + this.right.height/2 < this.ball.y) {
+                this.right.y += this.right.speed * 0.85 * dt;
+            } else if (this.right.y + this.right.height/2 > this.ball.y) {
+                this.right.y -= this.right.speed * 0.85 * dt;
+            }
         }
 
         if (this.ball.moveX === DIRECTRION.LEFT) this.ball.x -= this.ball.speed * dt;
@@ -159,20 +157,6 @@ var Game = {
         // paddle collision function
         function intersects(b, p) {
             return !(b.x > p.x + p.width || b.x + b.width < p.x || b.y > p.y + p.height || b.y + b.height < p.y);
-        }
-
-        stopadhpowerup: function() {
-            var size = 18;
-            this.powerup = {
-                x: Math.random() * (this.canvasWidth - size - 80) + 40,
-                y: Math.random() * (this.canvasHeight - size - 40) + 20,
-                size: size,
-                disappearAt: performance.now() + 5000, //gets rid of it
-            };
-        }
-        frozen:function(side) {
-            var now = performance.now();
-            return side === 'left' ? now < this.leftfroze : now < this.rightfroze;
         }
 
         // left paddle collision
@@ -213,6 +197,23 @@ var Game = {
                this.nextpowerupin = now + 6000;
            }
         }
+     } 
+    },
+
+
+    stopadhpowerup: function() {
+        var size = 18;
+        this.powerup = {
+            x: Math.random() * (this.canvasWidth - size - 80) + 40,
+            y: Math.random() * (this.canvasHeight - size - 40) + 20,
+            size: size,
+            expiresAt: performance.now() + 5000
+        };
+    },
+
+    frozen: function(side) {
+        var now = performance.now();
+        return side === 'left' ? now < this.leftfroze : now < this.rightfroze;
     },
 
     resetBall: function(lastScored) {
