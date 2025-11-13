@@ -18,7 +18,7 @@ var Ball = {
             y: (this.canvasHeight / 2) - 9,
             moveX: DIRECTRION.IDLE,
             moveY: DIRECTRION.IDLE,
-            speed: incrementSpeed || 36
+            speed: incrementSpeed || 23
         };
     }
 }
