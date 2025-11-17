@@ -49,6 +49,8 @@ var Game = {
         this.left = Robot.new.call(this, 'left');
         this.right = Robot.new.call(this, 'right');
 
+        this.right.speed = this.left.speed * 1.2;
+
         this.ballImage = null;
 
         this.keys = {};
