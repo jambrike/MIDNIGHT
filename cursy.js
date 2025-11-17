@@ -168,7 +168,7 @@ var Game = {
             var hit = (this.ball.y + this.ball.height/2) - (this.left.y + this.left.height/2);
             this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.65; // lowered from 0.8
+                this.ball.speed += 0.32;
             }
             this.lastonehit='left';
         }
@@ -178,7 +178,7 @@ var Game = {
             var hit2 = (this.ball.y + this.ball.height/2) - (this.right.y + this.right.height/2);
             this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.65; // lowered from 0.8
+                this.ball.speed += 0.32;
             }
             this.lastonehit='right';
         }
