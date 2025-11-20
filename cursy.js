@@ -31,7 +31,7 @@ var Robot = {
             x: side === 'left' ? 150 : this.canvasWidth - 150,
             y: (this.canvasHeight / 2) - 35,
             score: 0,
-            speed: 10
+            speed: 9.2
         };
     }
 }
@@ -49,7 +49,8 @@ var Game = {
         this.left = Robot.new.call(this, 'left');
         this.right = Robot.new.call(this, 'right');
 
-        this.right.speed = this.left.speed * 1.2;
+        // make him bit faster
+        this.right.speed = this.left.speed * 1.36;
 
         this.ballImage = null;
 
@@ -166,9 +167,20 @@ var Game = {
         if (intersects(this.ball, this.left) && this.ball.moveX === DIRECTRION.LEFT) {
             this.ball.moveX = DIRECTRION.RIGHT;
             var hit = (this.ball.y + this.ball.height/2) - (this.left.y + this.left.height/2);
-            this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
+            // add a bit of randomness so the ball doesn't get stuck in repeating loops
+            if (Math.abs(hit) < this.left.height * 0.12) {
+                // near centre — randomize vertical direction
+                this.ball.moveY = Math.random() > 0.5 ? DIRECTRION.UP : DIRECTRION.DOWN;
+            } else {
+                this.ball.moveY = hit < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
+                // small chance to flip the vertical direction
+                if (Math.random() < 0.15) this.ball.moveY = this.ball.moveY === DIRECTRION.UP ? DIRECTRION.DOWN : DIRECTRION.UP;
+            }
+            // tiny vertical nudge and push the ball out of the paddle to avoid sticking
+            this.ball.y += (Math.random() - 0.5) * 8;
+            this.ball.x = this.left.x + this.left.width + 1;
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.32;
+                this.ball.speed += 0.32 + Math.random() * 0.08;
             }
             this.lastonehit='left';
         }
@@ -176,9 +188,16 @@ var Game = {
         if (intersects(this.ball, this.right) && this.ball.moveX === DIRECTRION.RIGHT) {
             this.ball.moveX = DIRECTRION.LEFT;
             var hit2 = (this.ball.y + this.ball.height/2) - (this.right.y + this.right.height/2);
-            this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
+            if (Math.abs(hit2) < this.right.height * 0.12) {
+                this.ball.moveY = Math.random() > 0.5 ? DIRECTRION.UP : DIRECTRION.DOWN;
+            } else {
+                this.ball.moveY = hit2 < 0 ? DIRECTRION.UP : DIRECTRION.DOWN;
+                if (Math.random() < 0.15) this.ball.moveY = this.ball.moveY === DIRECTRION.UP ? DIRECTRION.DOWN : DIRECTRION.UP;
+            }
+            this.ball.y += (Math.random() - 0.5) * 8;
+            this.ball.x = this.right.x - this.ball.width - 1;
             if (performance.now() - this.gameStartTime < 25000) {
-                this.ball.speed += 0.32;
+                this.ball.speed += 0.32 + Math.random() * 0.08;
             }
             this.lastonehit='right';
         }
@@ -237,6 +256,8 @@ var Game = {
         if (!lastScored) serveLeft = (Math.random() > 0.5) ? DIRECTRION.LEFT : DIRECTRION.RIGHT;
         this.ball.moveX = serveLeft;
         this.ball.moveY = (Math.random() > 0.5) ? DIRECTRION.UP : DIRECTRION.DOWN;
+        // small random vertical offset on serve to avoid identical repeats
+        this.ball.y += (Math.random() - 0.5) * 24;
     },
 
     draw: function() {
@@ -293,10 +314,8 @@ var Game = {
         }
     }
 };
-// start when page loads
 window.addEventListener('load', function() {
     if (document.getElementById('gameCanvas')) {
         Game.initialize();
-        //cant stop at 299 lines cant stop goof song aswell
     }
 });
