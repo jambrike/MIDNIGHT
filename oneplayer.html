@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <title>ONE PLAYER MODE</title>  
+    
+    <style>
+        body {
+            margin: 0;
+            background: f2f2f2;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+        }
+ 
+        #gamearea {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: #ffffff;
+        }
+
+        #player {
+            width: 35px;
+            height: 35px;
+            background: #007bff;/* ADD SPRITE LATER/*/
+            position: absolute;
+            border-radius: 5px;
+        }
+
+        #enemy {
+            width: 32px;
+            height: 32px;
+            background: #ff0000;
+            position: absolute;
+            border-radius: 5px;
+        }
+        #gameover {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ff0000;
+            display: none; /* THIS IS ONLY TILL I MAKE ACTUAL END SCREEN */
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #333333;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+        }
+    </style>
+    </head>
+    <body>
+        <div id="gamearea">
+            <div id="player"></div>
+            <div id="enemy"></div>
+            <div id="gameover">GAME OVER</div>
+            <div id="score">Score: 0</div>
+        </div>
+
+        <script>
+            const gameA = document.getElementById('gamearea');
+            const player = document.getElementById('player');
+            const enemy = document.getElementById('enemy');
+            const gameOverText = document.getElementById('gameover');
+            const scoreblock = document.getElementById("score")
+
+            let playerX = 200, playerY = 200;
+            let enemyX = 600, enemyY = 600;
+            let gamespeed = 5;
+            let enemySpeed = 3;
+
+            let score = 0;
+            let keys = {};
+
+            document.addEventListener('keydown', (e) => {
+                keys[e.key] = true;
+            });
+
+            document.addEventListener('keyup', (e) => {
+                keys[e.key] = false;
+            });
+
+        //functions
+        function movePlayer() {
+            if (keys['ArrowUp']) playerY -= gamespeed;
+            if (keys['ArrowDown'])playerY += gamespeed;
+            if (keys['ArrowLeft'])playerX -= gamespeed;
+            if (keys['ArrowRight']) playerX += gamespeed;
+            
+            // Boundary stuff
+        const maxX = window.innerWidth - 35;
+        const maxY = window.innerHeight - 35;
+
+        if (playerX < 0) playerX = 0;
+        if (playerY < 0) playerY = 0;
+        if (playerX > maxX) playerX = maxX;
+        if (playerY > maxY) playerY = maxY;
+
+        player.style.left = playerX + "px";
+        player.style.top = playerY + "px";
+        }
+
+
+        //enemy math stuff
+        function moveEnemy() {
+            const dx = playerX - enemyX;
+            const dy = playerY - enemyY;
+            const angle = Math.atan2(dy,dx);
+
+                enemyX += Math.cos(angle) * enemySpeed;
+                enemyY += Math.sin(angle) * enemySpeed;
+            
+            enemy.style.left = enemyX + "px";
+            enemy.style.top = enemyY + "px";
+        }
+
+        function collisiondetection(){
+            const pRect = player.getBoundingClientRect();
+            const enemyRect = enemy.getBoundingClientRect(); //do not simplify enemy and rect
+
+            const overlap = !(pRect.right < enemyRect.left || 
+                              pRect.left > enemyRect.right || 
+                              pRect.bottom < enemyRect.top || 
+                              pRect.top > enemyRect.bottom);
+            if (overlap) {
+                gameOverText.style.display = 'block';
+                running = false;
+            }
+
+
+        }
+        function updatescore(){
+            score++;
+            scoreblock.textContent = "Score: " + score;
+        }
+        let running = true;
+        function gameLoop() {
+            if (!running) return;
+            movePlayer();
+            moveEnemy();
+            collisiondetection();
+            updatescore();
+            requestAnimationFrame(gameLoop);
+        }
+        setInterval(updatescore, 1000);
+        requestAnimationFrame(gameLoop);
+        gameLoop();
+
+        </script>
+    </body>
+</html>
