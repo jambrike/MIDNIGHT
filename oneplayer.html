@@ -86,7 +86,7 @@
             let pVelx = 0, pVely = 0;
             let eVelx = 0, eVely = 0;
             let enemyAcceleration = 0.64;
-            let enemyFriction = 0.78;
+            let enemyFriction = 0.69;
             //pause variable for esc
             let paused = false;
             let enemyspeedboost = 1;
@@ -181,7 +181,7 @@
             scoreblock.textContent = "Score: " + score;
             //make enemy faster update
             if (score % 10 === 0){
-                enemyspeedboost *= 1.012;
+                enemyspeedboost *= 1.0079;
         }
     }
         function gameLoop() {
