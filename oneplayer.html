@@ -57,6 +57,24 @@
             padding: 5px 10px;
             background: rgba(255, 255, 255, 0.7);
             border-radius: 5px;
+
+            #outsidestaminabar{
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 200px;
+                height: 20px;
+                background: #555555;
+                border-radius: 10px;
+            }
+            #staminabar{
+                width: 100%;
+                height: 100%;
+                background: #00ff00;
+                border-radius: 10px;
+                transition: width 0.2s ease;
+            }
         }
     </style>
     </head>
@@ -66,6 +84,8 @@
             <div id="enemy"></div>
             <div id="gameover">GAME OVER</div>
             <div id="score">Score: 0</div>
+            <div id ='outsidestaminabar'>
+                <div id ='staminabar'></div>
         </div>
 
         <script>
@@ -75,7 +95,7 @@
             const gameOverText = document.getElementById('gameover');
             const scoreblock = document.getElementById("score")
             const accelleration = 0.89;
-            const friction = 0.9;
+            const friction = 0.90;
             document.body.classList.add('hide-cursor');//starts gane with ni cursor
         
 
@@ -85,8 +105,16 @@
             let enemySpeed = 3;
             let pVelx = 0, pVely = 0;
             let eVelx = 0, eVely = 0;
-            let enemyAcceleration = 0.64;
+            let enemyAcceleration = 0.7;
             let enemyFriction = 0.69;
+            //dash power up variables
+        
+            let dashpower = 15;
+            let dashcooldown = false;
+            let dashcost = 40; 
+            let stamina = 100;
+            let maxstamina = 100;
+            let staminarate = 0.4; //stamina regen rate
             //pause variable for esc
             let paused = false;
             let enemyspeedboost = 1;
@@ -115,7 +143,16 @@
                     }
                 }
             });
+//dash function
+function performDash() {
+            document.addEventListener("keydown", e => {
+    keys[e.key] = true;
 
+    if (e.key === " " && !dashCooldown && stamina > dashCost) {
+        performDash();
+    }
+    });
+        }
         //functions
         function movePlayer() {
             if (keys['ArrowUp']) pVely -= accelleration;
@@ -140,7 +177,46 @@
             if (playerY > maxY) playerY = maxY;
             player.style.left = playerX + "px";
             player.style.top = playerY + "px";
+    
         }
+        function performDash() {
+            if (dashcooldown) return; // Prevent dashing if on cooldown
+
+            // Calculate dash direction
+            let dashDirX = 0;
+            let dashDirY = 0;
+            if (keys['ArrowUp']) dashDirY -= 1;
+            if (keys['ArrowDown']) dashDirY += 1;
+            if (keys['ArrowLeft']) dashDirX -= 1;
+            if (keys['ArrowRight']) dashDirX += 1;
+
+            // Normalize direction
+            const length = Math.hypot(dashDirX, dashDirY);
+            if (length === 0) return; // No movement keys pressed
+
+            dashDirX /= length;
+            dashDirY /= length;
+
+            // Apply dash
+            pVelx += dashDirX * dashpower;
+            pVely += dashDirY * dashpower;
+
+            // Start cooldown
+            dashcooldown = true;
+            setTimeout(() => {
+                dashcooldown = false;
+            }, 1000); // 1 second cooldown
+            //enemy slown after dash
+            enemyAcceleration *= 0.85;
+        }
+        //call dash function on spacebar press
+        document.addEventListener('keydown', (e) => {
+            if (e.key === ' '){
+                performDash();
+            }
+        });
+         //okay then add invisibility like ground power up
+
         
 
 
@@ -191,6 +267,10 @@
             collisiondetection();
             updatescore();
             requestAnimationFrame(gameLoop);
+            // Update stamina bar
+            stamina = Math.min(maxstamina, stamina + staminarate);
+            document.getElementById('staminabar').style.width = (stamina / maxstamina * 100) + '%';
+
         }
         setInterval(updatescore, 1000);
         requestAnimationFrame(gameLoop);
