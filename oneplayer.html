@@ -90,6 +90,7 @@
             //pause variable for esc
             let paused = false;
             let enemyspeedboost = 1;
+            let running = true;
 
 
 
@@ -122,7 +123,7 @@
             if (keys['ArrowLeft']) pVelx -= accelleration;
             if (keys['ArrowRight']) pVelx += accelleration;
             if (paused) return;
-            
+
         //fristion
             pVelx *= friction;
             pVely *= friction;
@@ -178,13 +179,11 @@
         function updatescore(){
             score++;
             scoreblock.textContent = "Score: " + score;
-
             //make enemy faster update
             if (score % 10 === 0){
                 enemyspeedboost *= 1.13;
         }
-
-        let running = true;
+    }
         function gameLoop() {
             if (!running) return;
             movePlayer();
@@ -196,7 +195,6 @@
         setInterval(updatescore, 1000);
         requestAnimationFrame(gameLoop);
         gameLoop();
-        }
         </script>
     </body>
 </html>
