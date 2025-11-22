@@ -11,6 +11,10 @@
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
         }
+    /* to hide mouse when game start */
+    body.hide-cursor {
+        cursor: none;
+    }
  
         #gamearea {
             width: 100vw;
@@ -70,11 +74,24 @@
             const enemy = document.getElementById('enemy');
             const gameOverText = document.getElementById('gameover');
             const scoreblock = document.getElementById("score")
+            const accelleration = 0.45;
+            const friction = 0.85;
+            document.body.classList.add('hide-cursor');//starts gane with ni cursor
+        
 
             let playerX = 200, playerY = 200;
             let enemyX = 600, enemyY = 600;
             let gamespeed = 5;
             let enemySpeed = 3;
+            let pVelx = 0, pVely = 0;
+            let eVelx = 0, eVely = 0;
+            let enemyAcceleration = 0.25;
+            let enemyFriction = 0.9;
+            //pause variable for esc
+            let paused = false;
+            let enemyspeedboost = 1;
+
+
 
             let score = 0;
             let keys = {};
@@ -86,26 +103,44 @@
             document.addEventListener('keyup', (e) => {
                 keys[e.key] = false;
             });
+// escape button to pause game
+            document.addEventListener('keydown', (e) => {
+                if (e.key === "Escape") {
+                    paused = !paused;
+                    if (paused) {
+                        document.body.classList.remove('hide-cursor');
+                    } else {
+                        document.body.classList.add('hide-cursor');
+                    }
+                }
+            });
 
         //functions
         function movePlayer() {
-            if (keys['ArrowUp']) playerY -= gamespeed;
-            if (keys['ArrowDown'])playerY += gamespeed;
-            if (keys['ArrowLeft'])playerX -= gamespeed;
-            if (keys['ArrowRight']) playerX += gamespeed;
+            if (keys['ArrowUp']) pVely -= accelleration;
+            if (keys['ArrowDown']) pVely += accelleration;
+            if (keys['ArrowLeft']) pVelx -= accelleration;
+            if (keys['ArrowRight']) pVelx += accelleration;
+            if (paused) return;
             
-            // Boundary stuff
-        const maxX = window.innerWidth - 35;
-        const maxY = window.innerHeight - 35;
+        //fristion
+            pVelx *= friction;
+            pVely *= friction;
 
-        if (playerX < 0) playerX = 0;
-        if (playerY < 0) playerY = 0;
-        if (playerX > maxX) playerX = maxX;
-        if (playerY > maxY) playerY = maxY;
+            playerX += pVelx;
+            playerY += pVely;
 
-        player.style.left = playerX + "px";
-        player.style.top = playerY + "px";
+            const maxX = window.innerWidth - 35; //player width
+            const maxY = window.innerHeight - 35; //player height
+
+            if (playerX < 0) playerX = 0;
+            if (playerY < 0) playerY = 0;
+            if (playerX > maxX) playerX = maxX;
+            if (playerY > maxY) playerY = maxY;
+            player.style.left = playerX + "px";
+            player.style.top = playerY + "px";
         }
+        
 
 
         //enemy math stuff
@@ -113,10 +148,14 @@
             const dx = playerX - enemyX;
             const dy = playerY - enemyY;
             const angle = Math.atan2(dy,dx);
-
-                enemyX += Math.cos(angle) * enemySpeed;
-                enemyY += Math.sin(angle) * enemySpeed;
+//change with acelleration and firction stuff
+                eVelx += Math.cos(angle) * enemyAcceleration * enemyspeedboost;
+                eVely += Math.sin(angle) * enemyAcceleration * enemyspeedboost;
             
+            eVelx *= enemyFriction;
+            eVely *= enemyFriction;
+            enemyX += eVelx;
+            enemyY += eVely;
             enemy.style.left = enemyX + "px";
             enemy.style.top = enemyY + "px";
         }
@@ -139,7 +178,12 @@
         function updatescore(){
             score++;
             scoreblock.textContent = "Score: " + score;
+
+            //make enemy faster update
+            if (score % 10 === 0){
+                enemyspeedboost *= 1.13;
         }
+
         let running = true;
         function gameLoop() {
             if (!running) return;
