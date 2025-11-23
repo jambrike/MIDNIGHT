@@ -13,7 +13,7 @@
         .right img{
             max-width: 18%;
             /*very top right corner image size*/
-            height: 100%;
+            height: 80%;
             object-fit: contain;
             position: absolute;
             top: 5px;
@@ -37,7 +37,7 @@
             height: 35px;
             background: #007bff; /* ADD SPRITE LATER */
             position: absolute;
-            border-radius: 5px;
+            border-radius: 2px;
         }
 
         #enemy {
@@ -45,7 +45,7 @@
             height: 32px;
             background: #030000;
             position: absolute;
-            border-radius: 5px;
+            border-radius: 2px;
         }
         #gameover {
             position: absolute;
@@ -131,10 +131,10 @@
         
             let dashPower = 15;
             let dashCooldown = false;
-            let dashCost = 40; 
+            let dashCost = 59; 
             let stamina = 100;
             let maxStamina = 100;
-            let staminarate = 0.4; //stamina regen rate
+            let staminarate = 0.2; //stamina regen rate
             //pause variable for esc
             let paused = false;
             let enemyspeedboost = 1;
@@ -144,6 +144,7 @@
             let powerupx=0;
             let powerupy=0;
             let invis = false;
+            // make him wanderbit
             let wanderx=0;
             let wandery=0;
             let wandertime=0;
@@ -255,9 +256,9 @@
             dashCooldown = true;
             setTimeout(() => {
                 dashCooldown = false;
-            }, 1000); // 1 second cooldown
+            }, 300); // 0.3 second cooldown
             //enemy slown after dash
-            enemyAcceleration *= 0.85;
+            enemyAcceleration *= 0.9;
         }
         //call dash function on spacebar press
         document.addEventListener('keydown', (e) => {
