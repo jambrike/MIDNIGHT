@@ -7,9 +7,8 @@
     <style>
         body {
             margin: 0;
-            background: f2f2f2;
+            background: #f2f2f2;
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-
         }
         .right img{
             max-width: 18%;
@@ -19,7 +18,7 @@
             position: absolute;
             top: 5px;
             right: 0;
-            z-index: ;
+            z-index: 0;
         }
     /* to hide mouse when game start */
     body.hide-cursor {
@@ -36,7 +35,7 @@
         #player {
             width: 35px;
             height: 35px;
-            background: #007bff;/* ADD SPRITE LATER/*/
+            background: #007bff; /* ADD SPRITE LATER */
             position: absolute;
             border-radius: 5px;
         }
@@ -201,8 +200,8 @@
     
         }
         function dashcostfunction(){
-            if (stamina >= dashcost){
-                stamina -= dashcost;
+            if (stamina >= dashCost){
+                stamina -= dashCost;
                 return true;
             } else {
                 return false;
@@ -210,7 +209,7 @@
         }
 //dont know if i need this but autosuggest put it here couldnt do harm
         function dashrecharge(){
-            if (stamina < maxstamina){
+            if (stamina < maxStamina){
                 stamina += staminarate;
             }
 
@@ -262,7 +261,7 @@
         }
         //call dash function on spacebar press
         document.addEventListener('keydown', (e) => {
-            if (e.key === ' '){
+            if (e.code === 'Space'){
                 performDash();
             }
         });
@@ -326,33 +325,16 @@
             movePlayer();
             moveEnemy();
             collisiondetection();
-            updatescore();
             requestAnimationFrame(gameLoop);
             // Update stamina bar
-            stamina = Math.min(maxstamina, stamina + staminarate);
-            document.getElementById('staminabar').style.width = (stamina / maxstamina * 100) + '%';
+            stamina = Math.min(maxStamina, stamina + staminarate);
+            document.getElementById('staminabar').style.width = (stamina / maxStamina * 100) + '%';
             dashrecharge();
-            if (powerupact){
-                const pRect = player.getBoundingClientRect();
-                const powerup = document.getElementById('powerup');
-                const powerupRect = powerup.getBoundingClientRect();
-//collison algo.
-                const overlap = !(pRect.right < powerupRect.left || 
-                                  pRect.left > powerupRect.right || 
-                                  pRect.bottom < powerupRect.top || 
-                                  pRect.top > powerupRect.bottom);
-                if (overlap) {
-                    powerupact = false;
-                    document.getElementById('powerup').style.display = 'none';
-                    usepowerup();
-                    setTimeout(spawninvis, 7200); //respawn thing  
-                }
-            }
         }
         spawninvis();
         setInterval(updatescore, 1000);
         requestAnimationFrame(gameLoop);
         gameLoop();//damn nearly 400 lines of code
-        </script>
+    </script>
     </body>
 </html>
