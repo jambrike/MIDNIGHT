@@ -117,6 +117,13 @@
             const accelleration = 0.87;
             const friction = 0.90;
             document.body.classList.add('hide-cursor');//starts gane with ni cursor
+
+            //play music in background lil script
+            const backgroundmusic = new Audio("02.mp3")
+            backgroundmusic.loop = true;
+            backgroundmusic.volume = 0.58;
+            const pickup = new Audio("pickup.mp3")
+            pickup.volume = 0.7
         
 
             let playerX = 200, playerY = 200;
@@ -171,6 +178,11 @@
                     } else {
                         document.body.classList.add('hide-cursor');
                     }
+                }
+                if (paused){
+                    backgroundmusic.pause();
+                } else {
+                    backgroundmusic.play();
                 }
             });
             
@@ -227,6 +239,24 @@
             powerupact = true;
         }
 
+        function enemyWander(){
+            if (wandertime) <= 0) {
+                //lets make him go random direction off on a wander
+                const angle = Math.random() * Math.PI* 2;
+                wanderx = Math.cos(angle) * 2;
+                wandery = math.sin(angle)*2;
+                wandertime = 400;
+            }
+            enemyX += wanderx
+            enemyY += wandery
+
+            enemyX = Math.max(0,Math.min(enemyX, window.innerwidth -32));
+             enemyY = Math.max(0,Math.min(enemyY, window.innerHeight -32));
+
+             enemy.style.left = enemyX + "px"
+             enemy.style.top = enemyY + "px"
+
+        }
 
         function performDash() {
             if (dashCooldown) return; // Prevent dashing if on cooldown
@@ -268,7 +298,11 @@
         });
         //enemy math stuff
         function moveEnemy() {
-            if (invis) return;
+            if (invis){
+                enemywander();
+                return;
+            }
+
 
             const dx = playerX - enemyX;
             const dy = playerY - enemyY;
@@ -295,6 +329,25 @@
                 player.style.opacity = "1";
             } , 1450);
         }
+        //collisiom with powerup
+        if (powerupact){
+            const pRect = player.getBoundingClientRect();
+            const powerupRect = document.getElementById('powerup').getBoundingClientRect();
+
+            const overlap = !(pRect.right < powerupRect.left || 
+                              pRect.left > powerupRect.right || 
+                              pRect.bottom < powerupRect.top || 
+                              pRect.top > powerupRect.bottom);
+            if (overlap) {
+                usepowerup();
+                document.getElementById('powerup').style.display = 'none';
+                powerupact = false;
+                //to play pick up noise
+                pickup.currentTime = 0;
+                pickup.play();
+                setTimeout(spawninvis, 7000); //respawn powerup after 7 seconds
+            }
+        }
 
         function collisiondetection(){
             const pRect = player.getBoundingClientRect();
@@ -316,11 +369,16 @@
             scoreblock.textContent = "Score: " + score;
             //make enemy faster update
             if (score % 1 === 0){
-                enemyspeedboost *= 1.012;//keep this low he gets quick mad fast//scratch that make it higher
+                enemyspeedboost *= 0.049;
 
         }
     }
         function gameLoop() {
+            if (!backgroundmusic.started){
+                backgroundmusic.play();
+                backgroundmusic = true 
+                
+            }
             if (!running) return;
             movePlayer();
             moveEnemy();
