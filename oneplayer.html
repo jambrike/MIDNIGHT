@@ -105,9 +105,10 @@
             <div id="score">Score: 0</div>
             <div id ='outsidestaminabar'>
                 <div id ='staminabar'></div>
+            </div>
             <div class ="right">
                 <img src="gameinformation.png" alt="Game Icon">
-
+            </div>
         <script>
             const gameA = document.getElementById('gamearea');
             const player = document.getElementById('player');
@@ -143,6 +144,10 @@
             let powerupact=false;
             let powerupx=0;
             let powerupy=0;
+            let invis = false;
+            let wanderx=0;
+            let wandery=0;
+            let wandertime=0;
 
 
 
@@ -169,16 +174,6 @@
                 }
             });
             
-//dash function
-function performDash() {
-            document.addEventListener("keydown", e => {
-    keys[e.key] = true;
-
-    if (e.key === " " && !dashCooldown && stamina > dashCost) {
-        performDash();
-    }
-    });
-        }
         //functions
         function movePlayer() {
             if (keys['ArrowUp']) pVely -= accelleration;
@@ -226,8 +221,8 @@ function performDash() {
             powerupx = Math.random() * (window.innerWidth - size);
             powerupy = Math.random() * (window.innerHeight - size);
             const powerup = document.getElementById('powerup');
-            p.style.left = powerupx + "px";
-            p.style.top = powerupy + "px";
+            powerup.style.left = powerupx + "px";
+            powerup.style.top = powerupy + "px";
             powerup.style.display = 'block';
             powerupact = true;
         }
@@ -272,9 +267,12 @@ function performDash() {
 
         //enemy math stuff
         function moveEnemy() {
+            if (invis) return;
+
             const dx = playerX - enemyX;
             const dy = playerY - enemyY;
             const angle = Math.atan2(dy,dx);
+
 //change with acelleration and firction stuff
                 eVelx += Math.cos(angle) * enemyAcceleration * enemyspeedboost;
                 eVely += Math.sin(angle) * enemyAcceleration * enemyspeedboost;
@@ -283,16 +281,17 @@ function performDash() {
             eVely *= enemyFriction;
             enemyX += eVelx;
             enemyY += eVely;
+
             enemy.style.left = enemyX + "px";
             enemy.style.top = enemyY + "px";
         }
-        function usepowerup(){
+        function usepowerup() {
             //invisabilty
             invis = true;
-            player.style.opacity = 0.3;
+            player.style.opacity = "0.3";
             setTimeout(() => {
                 invis = false;
-                player.style.opacity = 1;
+                player.style.opacity = "1";
             } , 1450);
         }
 
