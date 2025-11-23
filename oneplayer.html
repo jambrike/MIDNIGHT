@@ -11,6 +11,16 @@
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 
         }
+        .right img{
+            max-width: 14%;
+            /*top right corner image size*/
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+        }
     /* to hide mouse when game start */
     body.hide-cursor {
         cursor: none;
@@ -58,6 +68,14 @@
             background: rgba(255, 255, 255, 0.7);
             border-radius: 5px;
         }
+        #powerup {
+            width: 22px;
+            height: 22px;
+            background: #b34eed;
+            position: absolute;
+            border-radius: 4px;
+            display: none;/*till i add sprite*/
+        }
 
          #outsidestaminabar{
                 position: absolute;
@@ -75,18 +93,20 @@
                 background: #00ff00;
                 border-radius: 10px;
                 transition: width 0.2s ease;
-            }
+            }  
     </style>
     </head>
     <body>
         <div id="gamearea">
+            <div id="powerup"></div>
             <div id="player"></div>
             <div id="enemy"></div>
             <div id="gameover">GAME OVER</div>
             <div id="score">Score: 0</div>
             <div id ='outsidestaminabar'>
                 <div id ='staminabar'></div>
-        </div>
+            <div class ="right">
+                <img src="mousegameinfo.png" alt="Game Icon">
 
         <script>
             const gameA = document.getElementById('gamearea');
@@ -94,7 +114,7 @@
             const enemy = document.getElementById('enemy');
             const gameOverText = document.getElementById('gameover');
             const scoreblock = document.getElementById("score")
-            const accelleration = 0.89;
+            const accelleration = 0.87;
             const friction = 0.90;
             document.body.classList.add('hide-cursor');//starts gane with ni cursor
         
@@ -119,9 +139,14 @@
             let paused = false;
             let enemyspeedboost = 1;
             let running = true;
+            //powerup variables
+            let powerupact=false;
+            let powerupx=0;
+            let powerupy=0;
 
 
 
+            let powerupgo=false;
             let score = 0;
             let keys = {};
 
@@ -143,6 +168,7 @@
                     }
                 }
             });
+            
 //dash function
 function performDash() {
             document.addEventListener("keydown", e => {
@@ -179,6 +205,34 @@ function performDash() {
             player.style.top = playerY + "px";
     
         }
+        function dashcostfunction(){
+            if (stamina >= dashcost){
+                stamina -= dashcost;
+                return true;
+            } else {
+                return false;
+            }
+        }
+//dont know if i need this but autosuggest put it here couldnt do harm
+        function dashrecharge(){
+            if (stamina < maxstamina){
+                stamina += staminarate;
+            }
+
+
+        }
+        function spawninvis(){
+            const size = 22;
+            powerupx = Math.random() * (window.innerWidth - size);
+            powerupy = Math.random() * (window.innerHeight - size);
+            const powerup = document.getElementById('powerup');
+            p.style.left = powerupx + "px";
+            p.style.top = powerupy + "px";
+            powerup.style.display = 'block';
+            powerupact = true;
+        }
+
+
         function performDash() {
             if (dashcooldown) return; // Prevent dashing if on cooldown
 
@@ -215,10 +269,6 @@ function performDash() {
                 performDash();
             }
         });
-         //okay then add invisibility like ground power up
-
-        
-
 
         //enemy math stuff
         function moveEnemy() {
@@ -235,6 +285,15 @@ function performDash() {
             enemyY += eVely;
             enemy.style.left = enemyX + "px";
             enemy.style.top = enemyY + "px";
+        }
+        function usepowerup(){
+            //invisabilty
+            invis = true;
+            player.style.opacity = 0.3;
+            setTimeout(() => {
+                invis = false;
+                player.style.opacity = 1;
+            } , 1450);
         }
 
         function collisiondetection(){
@@ -257,7 +316,8 @@ function performDash() {
             scoreblock.textContent = "Score: " + score;
             //make enemy faster update
             if (score % 10 === 0){
-                enemyspeedboost *= 1.0079;
+                enemyspeedboost *= 1.0079;//keep this low he gets quick mad fast
+
         }
     }
         function gameLoop() {
@@ -270,11 +330,27 @@ function performDash() {
             // Update stamina bar
             stamina = Math.min(maxstamina, stamina + staminarate);
             document.getElementById('staminabar').style.width = (stamina / maxstamina * 100) + '%';
-
+            dashrecharge();
+            if (powerupact){
+                const pRect = player.getBoundingClientRect();
+                const powerup = document.getElementById('powerup');
+                const powerupRect = powerup.getBoundingClientRect();
+//collison algo.
+                const overlap = !(pRect.right < powerupRect.left || 
+                                  pRect.left > powerupRect.right || 
+                                  pRect.bottom < powerupRect.top || 
+                                  pRect.top > powerupRect.bottom);
+                if (overlap) {
+                    powerupact = false;
+                    document.getElementById('powerup').style.display = 'none';
+                    usepowerup();
+                    setTimeout(spawninvis, 7200); //respawn thing  
+                }
+            }
         }
         setInterval(updatescore, 1000);
         requestAnimationFrame(gameLoop);
-        gameLoop();
+        gameLoop();//damn nearly 400 lines of code
         </script>
     </body>
 </html>
