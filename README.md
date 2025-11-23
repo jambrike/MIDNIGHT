@@ -1,5 +1,5 @@
 # MIDNIGHT
-this is my repository for my first hack club project and going towards the midnight hackathon in austria. im making little website with a bunch of fun games i can play and mess around with when bored in class every week or so ill be adding in a new game hopefully they improve in quality as i move through as first time coding a proper game that im going to put online, spend most of my time fixing electronics and workin on some robotics stuff esp32 and allat.
+this is my repository for my first hack club project and going towards the midnight hackathon in austria. im making little website with a bunch of fun games i can play and mess around with when bored in class every week or so ill be adding in a new game hopefully they improve in quality as i move through as first time coding a proper game that im going to put online, spend most of my time fixing electronics and workin on some robotics stuff esp32,arduino and allat.
 
 Anyways i just built a nice little homepage with some art i spent way to long tryna draw on dodgy laptop and then followed tutorial on making pong game changed some speed made the bouncing more random though and then i made it a bit cool with you can put a pciture of anything on the ball and i added in a little freeze diamond upgrade for fun ig. 
 
