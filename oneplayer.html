@@ -231,7 +231,7 @@
         function performDash() {
             if (dashCooldown) return; // Prevent dashing if on cooldown
             if (stamina < dashCost) return;  // Not enough stamina
-
+//em so also fix amount of stamina used
             stamina -= dashCost;
 
             let dashDirX = 0;
@@ -260,13 +260,12 @@
             //enemy slown after dash
             enemyAcceleration *= 0.95;
         }
-        //call dash function on spacebar press
+        //call dash function .
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space'){
                 performDash();
             }
         });
-
         //enemy math stuff
         function moveEnemy() {
             if (invis) return;
@@ -316,8 +315,8 @@
             score++;
             scoreblock.textContent = "Score: " + score;
             //make enemy faster update
-            if (score % 10 === 0){
-                enemyspeedboost *= 1.032;//keep this low he gets quick mad fast//scratch that make it higher
+            if (score % 1 === 0){
+                enemyspeedboost *= 1.012;//keep this low he gets quick mad fast//scratch that make it higher
 
         }
     }
