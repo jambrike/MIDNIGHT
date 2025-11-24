@@ -240,11 +240,11 @@
         }
 
         function enemyWander(){
-            if (wandertime) 0;{
+            if (wandertime-- <= 0){
                 //lets make him go random direction off on a wander
                 const angle = Math.random() * Math.PI* 2;
                 wanderx = Math.cos(angle) * 2;
-                wandery = math.sin(angle)*2;
+                wandery = Math.sin(angle)*2;
                 wandertime = 400;
             }
             enemyX += wanderx
@@ -299,7 +299,7 @@
         //enemy math stuff
         function moveEnemy() {
             if (invis){
-                enemywander();
+                enemyWander();
                 return;
             }
 
@@ -329,25 +329,7 @@
                 player.style.opacity = "1";
             } , 1450);
         }
-        //collisiom with powerup
-        if (powerupact){
-            const pRect = player.getBoundingClientRect();
-            const powerupRect = document.getElementById('powerup').getBoundingClientRect();
-
-            const overlap = !(pRect.right < powerupRect.left || 
-                              pRect.left > powerupRect.right || 
-                              pRect.bottom < powerupRect.top || 
-                              pRect.top > powerupRect.bottom);
-            if (overlap) {
-                usepowerup();
-                document.getElementById('powerup').style.display = 'none';
-                powerupact = false;
-                //to play pick up noise
-                pickup.currentTime = 0;
-                pickup.play();
-                setTimeout(spawninvis, 7000); //respawn powerup after 7 seconds
-            }
-        }
+        
 
         function collisiondetection(){
             const pRect = player.getBoundingClientRect();
@@ -382,6 +364,24 @@
             if (!running) return;
             movePlayer();
             moveEnemy();
+            if (powerupact){
+            const pRect = player.getBoundingClientRect();
+            const powerupRect = document.getElementById('powerup').getBoundingClientRect();
+
+            const overlap = !(pRect.right < powerupRect.left || 
+                              pRect.left > powerupRect.right || 
+                              pRect.bottom < powerupRect.top || 
+                              pRect.top > powerupRect.bottom);
+            if (overlap) {
+                usepowerup();
+                document.getElementById('powerup').style.display = 'none';
+                powerupact = false;
+                //to play pick up noise
+                pickup.currentTime = 0;
+                pickup.play();
+                setTimeout(spawninvis, 7000); //respawn powerup after 7 seconds
+            }
+        }
             collisiondetection();
             requestAnimationFrame(gameLoop);
             // Update stamina bar
