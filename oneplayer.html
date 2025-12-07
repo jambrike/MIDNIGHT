@@ -9,10 +9,10 @@
             margin: 0;
             background: #f2f2f2;
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            overflow: hidden; /* Stops scrollbars from appearing */
         }
         .right img{
             max-width: 18%;
-            /*very top right corner image size*/
             height: 80%;
             object-fit: contain;
             position: absolute;
@@ -35,7 +35,7 @@
         #player {
             width: 35px;
             height: 35px;
-            background: #007bff; /* ADD SPRITE LATER */
+            background: #007bff; 
             position: absolute;
             border-radius: 2px;
         }
@@ -54,7 +54,8 @@
             transform: translate(-50%, -50%);
             font-size: 48px;
             color: #ff0000;
-            display: none; /* THIS IS ONLY TILL I MAKE ACTUAL END SCREEN */
+            display: none; 
+            z-index: 10;
         }
 
         #score {
@@ -66,6 +67,7 @@
             padding: 5px 10px;
             background: rgba(255, 255, 255, 0.7);
             border-radius: 5px;
+            z-index: 5;
         }
         #powerup {
             width: 22px;
@@ -73,7 +75,7 @@
             background: #b34eed;
             position: absolute;
             border-radius: 4px;
-            display: none;/*till i add sprite*/
+            display: none;
         }
 
          #outsidestaminabar{
@@ -91,7 +93,7 @@
                 height: 100%;
                 background: #febb20;
                 border-radius: 10px;
-                transition: width 0.2s ease;
+                transition: width 0.1s linear;
             }  
     </style>
     </head>
@@ -100,315 +102,300 @@
             <div id="powerup"></div>
             <div id="player"></div>
             <div id="enemy"></div>
-            <div id="gameover">GAME OVER</div>
+            <div id="gameover">GAME OVER<br><span style="font-size: 20px; color: black">Refresh to restart</span></div>
             <div id="score">Score: 0</div>
             <div id ='outsidestaminabar'>
                 <div id ='staminabar'></div>
             </div>
             <div class ="right">
-                <img src="gameinformation.png" alt="Game Icon">
+                <img src="gameinformation.png" alt="Game Icon" onerror="this.style.display='none'">
             </div>
         <script>
-            //turns out music cant auto play.
+            // --- AUDIO SETUP ---
             const backgroundmusic = new Audio("02.mp3");
             backgroundmusic.loop = true;
             backgroundmusic.volume = 0.58;
+            
+            const pickup = new Audio("pickup.mp3");
+            pickup.volume = 0.7;
+
             let musicHasStarted = false;
 
+            // --- GAME VARIABLES ---
             const gameA = document.getElementById('gamearea');
             const player = document.getElementById('player');
             const enemy = document.getElementById('enemy');
             const gameOverText = document.getElementById('gameover');
-            const scoreblock = document.getElementById("score")
-            const accelleration = 0.87;
+            const scoreblock = document.getElementById("score");
+            
+            const acceleration = 0.87; // fixed spelling
             const friction = 0.90;
-            document.body.classList.add('hide-cursor');//starts gane with ni cursor
-
-            //play music in background lil script
-            const pickup = new Audio("pickup.mp3")
-            pickup.volume = 0.7
-        
+            document.body.classList.add('hide-cursor');
 
             let playerX = 200, playerY = 200;
             let enemyX = 600, enemyY = 600;
-            let gamespeed = 5;
-            let enemySpeed = 3;
+            
             let pVelx = 0, pVely = 0;
             let eVelx = 0, eVely = 0;
             let enemyAcceleration = 0.7;
-            let enemyFriction = 0.69;
-            //dash power up variables
-        
+            let enemyFriction = 0.92; // Slightly higher friction so enemy controls better
+
+            // Dash variables
             let dashPower = 15;
             let dashCooldown = false;
-            let dashCost = 59; 
+            let dashCost = 50; 
             let stamina = 100;
             let maxStamina = 100;
-            let staminarate = 0.14; //stamina regen rate
-            //pause variable for esc
+            let staminarate = 0.4; 
+
+            // Game State
             let paused = false;
             let enemyspeedboost = 1;
             let running = true;
-            //powerup variables
-            let powerupact=false;
-            let powerupx=0;
-            let powerupy=0;
+
+            // Powerup variables
+            let powerupact = false;
+            let powerupx = 0;
+            let powerupy = 0;
             let invis = false;
-            // make him wanderbit
-            let wanderx=0;
-            let wandery=0;
-            let wandertime=0;
 
+            // Wander variables
+            let wanderx = 0;
+            let wandery = 0;
+            let wandertime = 0;
 
-
-            let powerupgo=false;
             let score = 0;
             let keys = {};
 
+            // --- CONTROLS ---
+
             document.addEventListener('keydown', (e) => {
                 keys[e.key] = true;
-    if (!musicHasStarted && !paused) {
-        backgroundmusic.play().catch(error => {
-            console.log("Browser blocked audio:", error);
-        });
-        musicHasStarted = true; 
-    }
-});
-
+                
+                // MUSIC FIX: This is the ONLY place we try to start music initially
+                if (!musicHasStarted && !paused) {
+                    backgroundmusic.play().catch(error => {
+                        console.log("Browser blocked audio:", error);
+                    });
+                    musicHasStarted = true; 
+                }
+            });
 
             document.addEventListener('keyup', (e) => {
                 keys[e.key] = false;
             });
-// escape button to pause game
+
+            // Escape to pause
             document.addEventListener('keydown', (e) => {
-    if (e.key === "Escape") {
-        paused = !paused;
+                if (e.key === "Escape") {
+                    paused = !paused;
 
-        if (paused) {
-            // Player paused: Stop the music and show cursor
-            document.body.classList.remove('hide-cursor');
-            backgroundmusic.pause();
-        } else {
-            // Player unpaused: Hide cursor
-            document.body.classList.add('hide-cursor');
+                    if (paused) {
+                        document.body.classList.remove('hide-cursor');
+                        backgroundmusic.pause();
+                    } else {
+                        document.body.classList.add('hide-cursor');
+                        if (musicHasStarted) {
+                            backgroundmusic.play();
+                        }
+                    }
+                }
+            });
             
-            // Only resume if we successfully started it earlier
-            if (musicHasStarted) {
-                backgroundmusic.play();
+            // Dash trigger
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space'){
+                    performDash();
+                }
+            });
+
+            // --- FUNCTIONS ---
+
+            function movePlayer() {
+                if (keys['ArrowUp']) pVely -= acceleration;
+                if (keys['ArrowDown']) pVely += acceleration;
+                if (keys['ArrowLeft']) pVelx -= acceleration;
+                if (keys['ArrowRight']) pVelx += acceleration;
+                
+                if (paused) return;
+
+                pVelx *= friction;
+                pVely *= friction;
+
+                playerX += pVelx;
+                playerY += pVely;
+
+                const maxX = window.innerWidth - 35; 
+                const maxY = window.innerHeight - 35; 
+
+                if (playerX < 0) playerX = 0;
+                if (playerY < 0) playerY = 0;
+                if (playerX > maxX) playerX = maxX;
+                if (playerY > maxY) playerY = maxY;
+                player.style.left = playerX + "px";
+                player.style.top = playerY + "px";
             }
-        }
-    }
-});
-            
-        //functions
-        function movePlayer() {
-            if (keys['ArrowUp']) pVely -= accelleration;
-            if (keys['ArrowDown']) pVely += accelleration;
-            if (keys['ArrowLeft']) pVelx -= accelleration;
-            if (keys['ArrowRight']) pVelx += accelleration;
-            if (paused) return;
 
-        //fristion
-            pVelx *= friction;
-            pVely *= friction;
+            function spawninvis(){
+                const size = 22;
+                let px = Math.random() * (window.innerWidth - size);
+                let py = Math.random() * (window.innerHeight - size);
+                const powerup = document.getElementById('powerup');
+                powerup.style.left = px + "px";
+                powerup.style.top = py + "px";
+                powerup.style.display = 'block';
+                powerupact = true;
+            }
 
-            playerX += pVelx;
-            playerY += pVely;
+            function enemyWander(){
+                if (wandertime-- <= 0){
+                    const angle = Math.random() * Math.PI* 2;
+                    wanderx = Math.cos(angle) * 2;
+                    wandery = Math.sin(angle) * 2;
+                    wandertime = 100;
+                }
+                enemyX += wanderx;
+                enemyY += wandery;
 
-            const maxX = window.innerWidth - 35; //player width
-            const maxY = window.innerHeight - 35; //player height
+                enemyX = Math.max(0, Math.min(enemyX, window.innerWidth -32));
+                enemyY = Math.max(0, Math.min(enemyY, window.innerHeight -32));
 
-            if (playerX < 0) playerX = 0;
-            if (playerY < 0) playerY = 0;
-            if (playerX > maxX) playerX = maxX;
-            if (playerY > maxY) playerY = maxY;
-            player.style.left = playerX + "px";
-            player.style.top = playerY + "px";
-    
-        }
-        function dashcostfunction(){
-            if (stamina >= dashCost){
+                enemy.style.left = enemyX + "px";
+                enemy.style.top = enemyY + "px";
+            }
+
+            function performDash() {
+                if (dashCooldown) return; 
+                if (stamina < dashCost) return; 
+                
                 stamina -= dashCost;
-                return true;
-            } else {
-                return false;
-            }
-        }
-//dont know if i need this but autosuggest put it here couldnt do harm
-        function dashrecharge(){
-            if (stamina < maxStamina){
-                stamina += staminarate;
-            }
 
+                let dashDirX = 0;
+                let dashDirY = 0;
+                if (keys['ArrowUp']) dashDirY -= 1;
+                if (keys['ArrowDown']) dashDirY += 1;
+                if (keys['ArrowLeft']) dashDirX -= 1;
+                if (keys['ArrowRight']) dashDirX += 1;
 
-        }
-        function spawninvis(){
-            const size = 22;
-            powerupx = Math.random() * (window.innerWidth - size);
-            powerupy = Math.random() * (window.innerHeight - size);
-            const powerup = document.getElementById('powerup');
-            powerup.style.left = powerupx + "px";
-            powerup.style.top = powerupy + "px";
-            powerup.style.display = 'block';
-            powerupact = true;
-        }
+                const length = Math.hypot(dashDirX, dashDirY);
+                if (length === 0) return; 
 
-        function enemyWander(){
-            if (wandertime-- <= 0){
-                //lets make him go random direction off on a wander
-                const angle = Math.random() * Math.PI* 2;
-                wanderx = Math.cos(angle) * 2;
-                wandery = Math.sin(angle)*2;
-                wandertime = 400;
-            }
-            enemyX += wanderx
-            enemyY += wandery
+                dashDirX /= length;
+                dashDirY /= length;
 
-            enemyX = Math.max(0,Math.min(enemyX, window.innerWidth -32));
-             enemyY = Math.max(0,Math.min(enemyY, window.innerHeight -32));
+                pVelx += dashDirX * dashPower;
+                pVely += dashDirY * dashPower;
 
-             enemy.style.left = enemyX + "px"
-             enemy.style.top = enemyY + "px"
-
-        }
-
-        function performDash() {
-            if (dashCooldown) return; // Prevent dashing if on cooldown
-            if (stamina < dashCost) return;  // Not enough stamina
-//em so also fix amount of stamina used
-            stamina -= dashCost;
-
-            let dashDirX = 0;
-            let dashDirY = 0;
-            if (keys['ArrowUp']) dashDirY -= 1;
-            if (keys['ArrowDown']) dashDirY += 1;
-            if (keys['ArrowLeft']) dashDirX -= 1;
-            if (keys['ArrowRight']) dashDirX += 1;
-
-            // Normalize direction
-            const length = Math.hypot(dashDirX, dashDirY);
-            if (length === 0) return; // No movement keys pressed
-
-            dashDirX /= length;
-            dashDirY /= length;
-
-            // Apply dash
-            pVelx += dashDirX * dashPower;
-            pVely += dashDirY * dashPower;
-
-            // Start cooldown
-            dashCooldown = true;
-            setTimeout(() => {
-                dashCooldown = false;
-            }, 300); // 0.3 second cooldown
-            //enemy slown after dash
-            enemyAcceleration *= 0.95;
-        }
-        //call dash function .
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space'){
-                performDash();
-            }
-        });
-        //enemy math stuff
-        function moveEnemy() {
-            if (invis){
-                enemyWander();
-                return;
+                dashCooldown = true;
+                setTimeout(() => {
+                    dashCooldown = false;
+                }, 300); 
             }
 
+            function moveEnemy() {
+                if (invis){
+                    enemyWander();
+                    return;
+                }
 
-            const dx = playerX - enemyX;
-            const dy = playerY - enemyY;
-            const angle = Math.atan2(dy,dx);
+                const dx = playerX - enemyX;
+                const dy = playerY - enemyY;
+                const angle = Math.atan2(dy,dx);
 
-//change with acelleration and firction stuff
                 eVelx += Math.cos(angle) * enemyAcceleration * enemyspeedboost;
                 eVely += Math.sin(angle) * enemyAcceleration * enemyspeedboost;
-            
-            eVelx *= enemyFriction;
-            eVely *= enemyFriction;
-            enemyX += eVelx;
-            enemyY += eVely;
-
-            enemy.style.left = enemyX + "px";
-            enemy.style.top = enemyY + "px";
-        }
-        function usepowerup() {
-            //invisabilty
-            invis = true;
-            player.style.opacity = "0.3";
-            setTimeout(() => {
-                invis = false;
-                player.style.opacity = "1";
-            } , 1450);
-        }
-        
-
-        function collisiondetection(){
-            const pRect = player.getBoundingClientRect();
-            const enemyRect = enemy.getBoundingClientRect(); //do not simplify enemy and rect
-
-            const overlap = !(pRect.right < enemyRect.left || 
-                              pRect.left > enemyRect.right || 
-                              pRect.bottom < enemyRect.top || 
-                              pRect.top > enemyRect.bottom);
-            if (overlap) {
-                gameOverText.style.display = 'block';
-                running = false;
-            }
-
-
-        }
-        function updatescore(){
-            score++;
-            scoreblock.textContent = "Score: " + score;
-            //make enemy faster update
-            if (score % 1 === 0){
-                enemyspeedboost *= 1.049;
-
-        }
-    }
-        function gameLoop() {
-            if (!backgroundmusic.started){
-                backgroundmusic.play();
-               
                 
-            }
-            if (!running) return;
-            movePlayer();
-            moveEnemy();
-            if (powerupact){
-            const pRect = player.getBoundingClientRect();
-            const powerupRect = document.getElementById('powerup').getBoundingClientRect();
+                eVelx *= enemyFriction;
+                eVely *= enemyFriction;
+                enemyX += eVelx;
+                enemyY += eVely;
 
-            const overlap = !(pRect.right < powerupRect.left || 
-                              pRect.left > powerupRect.right || 
-                              pRect.bottom < powerupRect.top || 
-                              pRect.top > powerupRect.bottom);
-            if (overlap) {
-                usepowerup();
-                document.getElementById('powerup').style.display = 'none';
-                powerupact = false;
-                //to play pick up noise
-                pickup.currentTime = 0;
-                pickup.play();
-                setTimeout(spawninvis, 7000); //respawn powerup after 7 seconds
+                enemy.style.left = enemyX + "px";
+                enemy.style.top = enemyY + "px";
             }
-        }
-            collisiondetection();
-            requestAnimationFrame(gameLoop);
-            // Reset the time to 0 so the sound restarts immediately if you pick up two fast
-            pickup.currentTime = 0; 
-            pickup.play().catch(e => console.log("Sound error"));
-            // Update stamina bar
-            stamina = Math.min(maxStamina, stamina + staminarate);
-            document.getElementById('staminabar').style.width = (stamina / maxStamina * 100) + '%';
-            dashrecharge();
-        }
-        spawninvis();
-        setInterval(updatescore, 1000);
-        //damn nearly 400 lines of code
-    </script>
+
+            function usepowerup() {
+                invis = true;
+                player.style.opacity = "0.3";
+                setTimeout(() => {
+                    invis = false;
+                    player.style.opacity = "1";
+                } , 1450);
+            }
+
+            function collisiondetection(){
+                const pRect = player.getBoundingClientRect();
+                const enemyRect = enemy.getBoundingClientRect(); 
+
+                const overlap = !(pRect.right < enemyRect.left || 
+                                  pRect.left > enemyRect.right || 
+                                  pRect.bottom < enemyRect.top || 
+                                  pRect.top > enemyRect.bottom);
+                if (overlap) {
+                    gameOverText.style.display = 'block';
+                    running = false;
+                    backgroundmusic.pause(); // STOP MUSIC ON DEATH
+                    document.body.classList.remove('hide-cursor');
+                }
+            }
+
+            function updatescore(){
+                if(paused || !running) return;
+
+                score++;
+                scoreblock.textContent = "Score: " + score;
+                
+                // Difficulty increase
+                if (score % 5 === 0){ 
+                    enemyspeedboost += 0.05; 
+                }
+            }
+
+            function gameLoop() {
+                if (!running) return;
+                
+                // Do not update positions if paused
+                if (!paused) {
+                    movePlayer();
+                    moveEnemy();
+                    collisiondetection();
+
+                    // POWERUP LOGIC
+                    if (powerupact){
+                        const pRect = player.getBoundingClientRect();
+                        const powerupEl = document.getElementById('powerup');
+                        const powerupRect = powerupEl.getBoundingClientRect();
+
+                        const overlap = !(pRect.right < powerupRect.left || 
+                                          pRect.left > powerupRect.right || 
+                                          pRect.bottom < powerupRect.top || 
+                                          pRect.top > powerupRect.bottom);
+                        
+                        if (overlap) {
+                            usepowerup();
+                            powerupEl.style.display = 'none';
+                            powerupact = false;
+                            
+                            // SOUND FIX: Only play sound HERE, when we actually touch the powerup
+                            pickup.currentTime = 0;
+                            pickup.play().catch(e => console.log("Sound error"));
+                            
+                            setTimeout(spawninvis, 7000); 
+                        }
+                    }
+
+                    // Update stamina bar
+                    stamina = Math.min(maxStamina, stamina + staminarate);
+                    document.getElementById('staminabar').style.width = (stamina / maxStamina * 100) + '%';
+                }
+
+                requestAnimationFrame(gameLoop);
+            }
+
+            // Start the game
+            spawninvis();
+            setInterval(updatescore, 1000);
+            gameLoop(); // Important: Actually start the loop!
+        </script>
     </body>
 </html>
