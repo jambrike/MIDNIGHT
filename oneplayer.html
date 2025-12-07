@@ -109,6 +109,12 @@
                 <img src="gameinformation.png" alt="Game Icon">
             </div>
         <script>
+            //turns out music cant auto play.
+            const backgroundmusic = new Audio("02.mp3");
+            backgroundmusic.loop = true;
+            backgroundmusic.volume = 0.58;
+            let musicHasStarted = false;
+
             const gameA = document.getElementById('gamearea');
             const player = document.getElementById('player');
             const enemy = document.getElementById('enemy');
@@ -119,9 +125,6 @@
             document.body.classList.add('hide-cursor');//starts gane with ni cursor
 
             //play music in background lil script
-            const backgroundmusic = new Audio("02.mp3")
-            backgroundmusic.loop = true;
-            backgroundmusic.volume = 0.58;
             const pickup = new Audio("pickup.mp3")
             pickup.volume = 0.7
         
@@ -164,27 +167,38 @@
 
             document.addEventListener('keydown', (e) => {
                 keys[e.key] = true;
-            });
+    if (!musicHasStarted && !paused) {
+        backgroundmusic.play().catch(error => {
+            console.log("Browser blocked audio:", error);
+        });
+        musicHasStarted = true; 
+    }
+});
+
 
             document.addEventListener('keyup', (e) => {
                 keys[e.key] = false;
             });
 // escape button to pause game
             document.addEventListener('keydown', (e) => {
-                if (e.key === "Escape") {
-                    paused = !paused;
-                    if (paused) {
-                        document.body.classList.remove('hide-cursor');
-                    } else {
-                        document.body.classList.add('hide-cursor');
-                    }
-                }
-                if (paused){
-                    backgroundmusic.pause();
-                } else {
-                    backgroundmusic.play();
-                }
-            });
+    if (e.key === "Escape") {
+        paused = !paused;
+
+        if (paused) {
+            // Player paused: Stop the music and show cursor
+            document.body.classList.remove('hide-cursor');
+            backgroundmusic.pause();
+        } else {
+            // Player unpaused: Hide cursor
+            document.body.classList.add('hide-cursor');
+            
+            // Only resume if we successfully started it earlier
+            if (musicHasStarted) {
+                backgroundmusic.play();
+            }
+        }
+    }
+});
             
         //functions
         function movePlayer() {
@@ -351,14 +365,14 @@
             scoreblock.textContent = "Score: " + score;
             //make enemy faster update
             if (score % 1 === 0){
-                enemyspeedboost *= 0.049;
+                enemyspeedboost *= 1.049;
 
         }
     }
         function gameLoop() {
             if (!backgroundmusic.started){
                 backgroundmusic.play();
-                backgroundmusic = true 
+               
                 
             }
             if (!running) return;
@@ -384,6 +398,9 @@
         }
             collisiondetection();
             requestAnimationFrame(gameLoop);
+            // Reset the time to 0 so the sound restarts immediately if you pick up two fast
+            pickup.currentTime = 0; 
+            pickup.play().catch(e => console.log("Sound error"));
             // Update stamina bar
             stamina = Math.min(maxStamina, stamina + staminarate);
             document.getElementById('staminabar').style.width = (stamina / maxStamina * 100) + '%';
@@ -391,8 +408,7 @@
         }
         spawninvis();
         setInterval(updatescore, 1000);
-        requestAnimationFrame(gameLoop);
-        gameLoop();//damn nearly 400 lines of code
+        //damn nearly 400 lines of code
     </script>
     </body>
 </html>
