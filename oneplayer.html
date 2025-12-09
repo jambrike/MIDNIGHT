@@ -120,7 +120,7 @@
             <div id="powerup"></div>
             <div id="player"></div>
             <div id="enemy"></div>
-            <div id="gameover">GAME OVER<br><span style="font-size: 20px; color: black">Refresh to restart</span></div>
+            <div id="gameover">GAME OVER<br><span style="font-size: 20px; color: black"></span></div>
             <div id="score">Score: 0</div>
             <div id ='outsidestaminabar'>
                 <div id ='staminabar'></div>
@@ -129,7 +129,6 @@
                 <img src="gameinformation.png" alt="Game Icon" onerror="this.style.display='none'">
             </div>
         <script>
-            // --- AUDIO SETUP ---
             const backgroundmusic = new Audio("02.mp3");
             backgroundmusic.loop = true;
             backgroundmusic.volume = 0.58;
@@ -139,14 +138,14 @@
 
             let musicHasStarted = false;
 
-            // --- GAME VARIABLES ---
+            // variables
             const gameA = document.getElementById('gamearea');
             const player = document.getElementById('player');
             const enemy = document.getElementById('enemy');
             const gameOverText = document.getElementById('gameover');
             const scoreblock = document.getElementById("score");
             
-            const acceleration = 0.87; // fixed spelling
+            const acceleration = 0.87; // 
             const friction = 0.90;
             document.body.classList.add('hide-cursor');
 
@@ -156,7 +155,7 @@
             let pVelx = 0, pVely = 0;
             let eVelx = 0, eVely = 0;
             let enemyAcceleration = 0.7;
-            let enemyFriction = 0.92; // Slightly higher friction so enemy controls better
+            let enemyFriction = 0.92; // 
 
             // Dash variables
             let dashPower = 15;
@@ -227,7 +226,7 @@
                 }
             });
 
-            // --- FUNCTIONS ---
+            // where the f the function
 
             function movePlayer() {
                 if (keys['ArrowUp']) pVely -= acceleration;
@@ -275,6 +274,8 @@
                 enemyX += wanderx;
                 enemyY += wandery;
 
+                enemyspeedboost * 0.993;
+
                 enemyX = Math.max(0, Math.min(enemyX, window.innerWidth -32));
                 enemyY = Math.max(0, Math.min(enemyY, window.innerHeight -32));
 
@@ -298,11 +299,15 @@
                 const length = Math.hypot(dashDirX, dashDirY);
                 if (length === 0) return; 
 
+                enemyspeedboost*0.984;
+
                 dashDirX /= length;
                 dashDirY /= length;
 
                 pVelx += dashDirX * dashPower;
                 pVely += dashDirY * dashPower;
+
+
 
                 dashCooldown = true;
                 setTimeout(() => {
@@ -352,7 +357,7 @@
                 if (overlap) {
                     gameOverText.style.display = 'block';
                     running = false;
-                    backgroundmusic.pause(); // STOP MUSIC ON DEATH
+                    backgroundmusic.pause(); 
                     document.body.classList.remove('hide-cursor');
                 }
             }
@@ -394,7 +399,6 @@
                             powerupEl.style.display = 'none';
                             powerupact = false;
                             
-                            // SOUND FIX: Only play sound HERE, when we actually touch the powerup
                             pickup.currentTime = 0;
                             pickup.play().catch(e => console.log("Sound error"));
                             
@@ -413,7 +417,7 @@
             // Start the game
             spawninvis();
             setInterval(updatescore, 1000);
-            gameLoop(); // Important: Actually start the loop!
+            gameLoop(); 
         </script>
     </body>
 </html>
