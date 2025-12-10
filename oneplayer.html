@@ -113,6 +113,19 @@
                 border-radius: 10px;
                 transition: width 0.1s linear;
             }  
+            #midnightbird{
+                width: 32px;
+                height: 32px;
+                background-size: contain;
+                position:absolute;
+                background-repeat: no-repeat
+                ;
+                z-index: 8;
+
+                transition:left 4s linear;
+               
+
+            }
     </style>
     </head>
     <body>
@@ -184,7 +197,6 @@
             let score = 0;
             let keys = {};
 
-            // --- CONTROLS ---
 
             document.addEventListener('keydown', (e) => {
                 keys[e.key] = true;
@@ -252,6 +264,29 @@
                 player.style.left = playerX + "px";
                 player.style.top = playerY + "px";
             }
+            //hackclub bird use for homepage too id say got iddea from when people sayed theyd do it with em what ya call it like for desktop
+            function hackclubbirdfly(){
+            const bird = document.createElement("div");
+            bird.classList.add(midnightbird);
+            const flyH = math.random()*(window.innerHeight*0.5);
+
+            bird.style.left = '-100px'; 
+            bird.style.top = flyHeight + 'px';
+
+            const gameArea = document.getElementById(gamearea);
+            gameArea.appendChild(bird);
+
+            setTimeout(() => {
+                bird.style.left = `${window.innerWidth + 100}px`; 
+            }, 50);
+
+            setTimeout(() => {
+            bird.remove(); 
+             }, 4500); 
+
+            setInterval(hackclubbirdfly, 15000);
+            }
+            
 
             function spawninvis(){
                 const size = 22;
