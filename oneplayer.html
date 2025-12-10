@@ -113,7 +113,7 @@
                 border-radius: 10px;
                 transition: width 0.1s linear;
             }  
-            #midnightbird{
+            .midnightbird{
                 width: 32px;
                 height: 32px;
                 background-size: contain;
@@ -160,6 +160,8 @@
             
             const acceleration = 0.87; // 
             const friction = 0.90;
+            const birdFlapFrames = ["wing_up.png", "wing_down.png"]; 
+
             document.body.classList.add('hide-cursor');
 
             let playerX = 200, playerY = 200;
@@ -238,6 +240,24 @@
                 }
             });
 
+function startBirdFlapCycle(birdElement) {
+    let frameIndex = 0;
+    
+    const flapInterval = setInterval(() => {
+        // Cycle between 0 and 1
+        frameIndex = 1 - frameIndex; 
+        
+        birdElement.style.backgroundImage = `url(${birdFlapFrames[frameIndex]})`;
+
+        if (!document.body.contains(birdElement)) {
+            clearInterval(flapInterval);
+        }
+        
+    }, 100); // Flapping speed 
+    
+    return flapInterval; // Return the ID so we can stop it later
+}
+
             // where the f the function
 
             function movePlayer() {
@@ -265,27 +285,43 @@
                 player.style.top = playerY + "px";
             }
             //hackclub bird use for homepage too id say got iddea from when people sayed theyd do it with em what ya call it like for desktop
-            function hackclubbirdfly(){
-            const bird = document.createElement("div");
-            bird.classList.add(midnightbird);
-            const flyH = math.random()*(window.innerHeight*0.5);
+          function hackclubbirdfly() {
+    const bird = document.createElement("div");
+    
+    bird.classList.add("midnightbird"); 
+    
+    const flyH = Math.random() * (window.innerHeight * 0.4); 
+    const isFlyingLeftToRight = true; 
+    let startX = -100;
+    let endX = window.innerWidth + 100;
 
-            bird.style.left = '-100px'; 
-            bird.style.top = flyHeight + 'px';
+    // Set initial image and direction
+    bird.style.backgroundImage = `url(${birdFlapFrames[0]})`;
+    bird.style.transform = isFlyingLeftToRight ? "scaleX(1)" : "scaleX(-1)";
 
-            const gameArea = document.getElementById(gamearea);
-            gameArea.appendChild(bird);
+    bird.style.left = startX + "px";
+    bird.style.top = flyH + "px";
 
-            setTimeout(() => {
-                bird.style.left = `${window.innerWidth + 100}px`; 
-            }, 50);
+    // FIX 2: Fixed typo "getElemntbyId" -> "getElementById"
+    const gameArea = document.getElementById("gamearea");
+    gameArea.appendChild(bird);
 
-            setTimeout(() => {
-            bird.remove(); 
-             }, 4500); 
+    // Start flapping
+    const flapTimerID = startBirdFlapCycle(bird);
 
-            setInterval(hackclubbirdfly, 15000);
-            }
+    // Trigger movement after small delay
+    setTimeout(() => {
+        bird.style.left = `${endX}px`; 
+    }, 50);
+
+    setTimeout(() => {
+        clearInterval(flapTimerID); 
+        bird.remove();
+    }, 4500); 
+}
+
+// Start the loop
+setInterval(hackclubbirdfly, 15000);
             
 
             function spawninvis(){
