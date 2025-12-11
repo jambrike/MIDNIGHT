@@ -30,6 +30,7 @@
             height: 100vh;
             position: relative;
             background: #ffffff;
+            overflow: hidden; /* Added to keep elements like the bird strictly within the view */
         }
 
         #player {
@@ -66,7 +67,9 @@
             font-size: 48px;
             color: #ff0000;
             display: none; 
-            z-index: 10;
+            z-index: 100; /* Increased Z-index */
+            text-align: center;
+            text-shadow: 2px 2px 0 #000;
         }
 
         #score {
@@ -105,6 +108,7 @@
                 height: 20px;
                 background: #555555;
                 border-radius: 10px;
+                z-index: 10;
             }
             #staminabar{
                 width: 100%;
@@ -114,8 +118,8 @@
                 transition: width 0.1s linear;
             }  
             .midnightbird{
-                width: 32px;
-                height: 32px;
+                width: 40px; /* Increased size slightly for better visibility */
+                height: 40px;
                 background-size: contain;
                 position:absolute;
                 background-repeat: no-repeat
@@ -133,7 +137,15 @@
             <div id="powerup"></div>
             <div id="player"></div>
             <div id="enemy"></div>
-            <div id="gameover">GAME OVER<br><span style="font-size: 20px; color: black"></span></div>
+            
+            <div id="gameover">
+                GAME OVER
+                <br>
+                <span style="font-size: 24px; color: black; font-weight: bold;">
+                    Press SPACE to Restart
+                </span>
+            </div>
+            
             <div id="score">Score: 0</div>
             <div id ='outsidestaminabar'>
                 <div id ='staminabar'></div>
@@ -157,6 +169,8 @@
             const enemy = document.getElementById('enemy');
             const gameOverText = document.getElementById('gameover');
             const scoreblock = document.getElementById("score");
+            const powerupEl = document.getElementById('powerup');
+            const staminaBar = document.getElementById('staminabar');
             
             const acceleration = 0.87; // 
             const friction = 0.90;
@@ -187,8 +201,6 @@
 
             // Powerup variables
             let powerupact = false;
-            let powerupx = 0;
-            let powerupy = 0;
             let invis = false;
 
             // Wander variables
@@ -202,6 +214,7 @@
 
             document.addEventListener('keydown', (e) => {
                 keys[e.key] = true;
+                keys[e.code] = true;
                 
                 // MUSIC FIX: This is the ONLY place we try to start music initially
                 if (!musicHasStarted && !paused) {
@@ -214,49 +227,90 @@
 
             document.addEventListener('keyup', (e) => {
                 keys[e.key] = false;
+                keys[e.code] = false;
             });
 
             // Escape to pause
             document.addEventListener('keydown', (e) => {
-                if (e.key === "Escape") {
-                    paused = !paused;
-
-                    if (paused) {
-                        document.body.classList.remove('hide-cursor');
-                        backgroundmusic.pause();
-                    } else {
-                        document.body.classList.add('hide-cursor');
-                        if (musicHasStarted) {
-                            backgroundmusic.play();
-                        }
-                    }
+                if (e.key === "Escape" && running) {
+                    togglePause();
                 }
             });
             
-            // Dash trigger
+            // Dash trigger & Restart trigger
             document.addEventListener('keydown', (e) => {
                 if (e.code === 'Space'){
-                    performDash();
+                    if (running && !paused) {
+                        performDash();
+                    } else if (!running) {
+                        resetGame(); // Restart game if game over
+                    }
                 }
             });
 
-function startBirdFlapCycle(birdElement) {
-    let frameIndex = 0;
-    
-    const flapInterval = setInterval(() => {
-        // Cycle between 0 and 1
-        frameIndex = 1 - frameIndex; 
-        
-        birdElement.style.backgroundImage = `url(${birdFlapFrames[frameIndex]})`;
+            function togglePause() {
+                paused = !paused;
+                if (paused) {
+                    document.body.classList.remove('hide-cursor');
+                    backgroundmusic.pause();
+                } else {
+                    document.body.classList.add('hide-cursor');
+                    if (musicHasStarted) {
+                        backgroundmusic.play();
+                    }
+                }
+            }
 
-        if (!document.body.contains(birdElement)) {
-            clearInterval(flapInterval);
-        }
-        
-    }, 100); // Flapping speed 
-    
-    return flapInterval; // Return the ID so we can stop it later
-}
+            function resetGame() {
+                // Reset positions
+                playerX = window.innerWidth / 2 - 17;
+                playerY = window.innerHeight / 2 - 17;
+                enemyX = 100; 
+                enemyY = 100;
+
+                // Reset state/stats
+                pVelx = 0; pVely = 0; eVelx = 0; eVely = 0;
+                score = 0;
+                scoreblock.textContent = "Score: 0";
+                enemyspeedboost = 1;
+                stamina = maxStamina;
+                invis = false;
+                player.style.opacity = "1";
+
+                // Reset visuals/flow
+                running = true;
+                paused = false;
+                gameOverText.style.display = 'none';
+                document.body.classList.add('hide-cursor');
+                
+                spawninvis(); // Rename to spawnPowerup, but keep original name for now
+                
+                if(musicHasStarted && backgroundmusic) {
+                    backgroundmusic.currentTime = 0;
+                    backgroundmusic.play();
+                }
+                
+                requestAnimationFrame(gameLoop);
+            }
+
+
+            function startBirdFlapCycle(birdElement) {
+                let frameIndex = 0;
+                
+                const flapInterval = setInterval(() => {
+                    // Cycle between 0 and 1
+                    frameIndex = 1 - frameIndex; 
+                    
+                    birdElement.style.backgroundImage = `url(${birdFlapFrames[frameIndex]})`;
+
+                    if (!document.body.contains(birdElement)) {
+                        clearInterval(flapInterval);
+                    }
+                    
+                }, 100); // Flapping speed 
+                
+                return flapInterval; // Return the ID so we can stop it later
+            }
 
             // where the f the function
 
@@ -277,58 +331,72 @@ function startBirdFlapCycle(birdElement) {
                 const maxX = window.innerWidth - 35; 
                 const maxY = window.innerHeight - 35; 
 
-                if (playerX < 0) playerX = 0;
-                if (playerY < 0) playerY = 0;
-                if (playerX > maxX) playerX = maxX;
-                if (playerY > maxY) playerY = maxY;
+                if (playerX < 0) { playerX = 0; pVelx *= -0.5; }
+                if (playerY < 0) { playerY = 0; pVely *= -0.5; }
+                if (playerX > maxX) { playerX = maxX; pVelx *= -0.5; }
+                if (playerY > maxY) { playerY = maxY; pVely *= -0.5; }
                 player.style.left = playerX + "px";
                 player.style.top = playerY + "px";
             }
             //hackclub bird use for homepage too id say got iddea from when people sayed theyd do it with em what ya call it like for desktop
-          function hackclubbirdfly() {
-    const bird = document.createElement("div");
-    bird.style.transform = "scaleX(-1)";
-    
-    bird.classList.add("midnightbird"); 
-    
-    const flyH = Math.random() * (window.innerHeight * 0.4); 
-    const isFlyingLeftToRight = true; 
-    let startX = -100;
-    let endX = window.innerWidth + 100;
+            function hackclubbirdfly() {
+                if(paused || !running) return;
 
-    // Set initial image and direction
-    bird.style.backgroundImage = `url(${birdFlapFrames[0]})`;
-    bird.style.transform = isFlyingLeftToRight ? "scaleX(1)" : "scaleX(-1)";
+                const bird = document.createElement("div");
+                bird.classList.add("midnightbird"); 
+                
+                // Randomly decide direction (50/50 chance)
+                const isFlyingRight = Math.random() < 0.5; 
 
-    bird.style.left = startX + "px";
-    bird.style.top = flyH + "px";
+                let startX, endX;
 
-    // FIX 2: Fixed typo "getElemntbyId" -> "getElementById"
-    const gameArea = document.getElementById("gamearea");
-    gameArea.appendChild(bird);
+                if (isFlyingRight) {
+                    // Flying Left -> Right
+                    startX = -100;
+                    endX = window.innerWidth + 100;
+                    
+                    // YOUR IMAGE FACES LEFT.
+                    // To face Right, we must FLIP it (-1).
+                    bird.style.transform = "scaleX(-1)"; 
+                } else {
+                    // Flying Right -> Left
+                    startX = window.innerWidth + 100;
+                    endX = -100;
+                    
+                    // YOUR IMAGE FACES LEFT.
+                    // To face Left, we keep it normal (1).
+                    bird.style.transform = "scaleX(1)"; 
+                }
 
-    // Start flapping
-    const flapTimerID = startBirdFlapCycle(bird);
+                const flyH = Math.random() * (window.innerHeight * 0.6); 
+                
+                bird.style.left = startX + "px";
+                bird.style.top = flyH + "px";
+                bird.style.backgroundImage = `url(${birdFlapFrames[0]})`;
+                
+                document.getElementById("gamearea").appendChild(bird);
 
-    // Trigger movement after small delay
-    setTimeout(() => {
-        bird.style.left = `${endX}px`; 
-    }, 50);
+                const flapTimerID = startBirdFlapCycle(bird);
 
-    setTimeout(() => {
-        clearInterval(flapTimerID); 
-        bird.remove();
-    }, 4500); 
-}
+                requestAnimationFrame(() => {
+                    bird.style.left = `${endX}px`; 
+                });
 
-// Start the loop
-setInterval(hackclubbirdfly, 15000);
+                setTimeout(() => {
+                    clearInterval(flapTimerID); 
+                    if(bird.parentNode) bird.remove();
+                }, 4000); 
+            }
+
+
+            // Start the loop
+            setInterval(hackclubbirdfly, 15000);
             
 
             function spawninvis(){
                 const size = 22;
-                let px = Math.random() * (window.innerWidth - size);
-                let py = Math.random() * (window.innerHeight - size);
+                let px = Math.random() * (window.innerWidth - size - 50) + 25;
+                let py = Math.random() * (window.innerHeight - size - 50) + 25;
                 const powerup = document.getElementById('powerup');
                 powerup.style.left = px + "px";
                 powerup.style.top = py + "px";
@@ -426,11 +494,32 @@ setInterval(hackclubbirdfly, 15000);
                                   pRect.left > enemyRect.right || 
                                   pRect.bottom < enemyRect.top || 
                                   pRect.top > enemyRect.bottom);
-                if (overlap) {
+                if (overlap && !invis) {
                     gameOverText.style.display = 'block';
                     running = false;
                     backgroundmusic.pause(); 
                     document.body.classList.remove('hide-cursor');
+                }
+                
+                // POWERUP LOGIC Check
+                if (powerupact){
+                    const powerupRect = powerupEl.getBoundingClientRect();
+
+                    const puOverlap = !(pRect.right < powerupRect.left || 
+                                      pRect.left > powerupRect.right || 
+                                      pRect.bottom < powerupRect.top || 
+                                      pRect.top > powerupRect.bottom);
+                    
+                    if (puOverlap) {
+                        usepowerup();
+                        powerupEl.style.display = 'none';
+                        powerupact = false;
+                        
+                        pickup.currentTime = 0;
+                        pickup.play().catch(e => console.log("Sound error"));
+                        
+                        setTimeout(spawninvis, 7000); 
+                    }
                 }
             }
 
@@ -453,34 +542,13 @@ setInterval(hackclubbirdfly, 15000);
                 if (!paused) {
                     movePlayer();
                     moveEnemy();
-                    collisiondetection();
-
-                    // POWERUP LOGIC
-                    if (powerupact){
-                        const pRect = player.getBoundingClientRect();
-                        const powerupEl = document.getElementById('powerup');
-                        const powerupRect = powerupEl.getBoundingClientRect();
-
-                        const overlap = !(pRect.right < powerupRect.left || 
-                                          pRect.left > powerupRect.right || 
-                                          pRect.bottom < powerupRect.top || 
-                                          pRect.top > powerupRect.bottom);
-                        
-                        if (overlap) {
-                            usepowerup();
-                            powerupEl.style.display = 'none';
-                            powerupact = false;
-                            
-                            pickup.currentTime = 0;
-                            pickup.play().catch(e => console.log("Sound error"));
-                            
-                            setTimeout(spawninvis, 7000); 
-                        }
-                    }
+                    
+                    // Collision check now handles both enemy and powerup
+                    collisiondetection(); 
 
                     // Update stamina bar
                     stamina = Math.min(maxStamina, stamina + staminarate);
-                    document.getElementById('staminabar').style.width = (stamina / maxStamina * 100) + '%';
+                    staminaBar.style.width = (stamina / maxStamina * 100) + '%';
                 }
 
                 requestAnimationFrame(gameLoop);
