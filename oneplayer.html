@@ -30,7 +30,7 @@
             height: 100vh;
             position: relative;
             background: #ffffff;
-            overflow: hidden; /* Added to keep elements like the bird strictly within the view */
+            overflow: hidden;
         }
 
         #player {
@@ -66,9 +66,9 @@
             transform: translate(-50%, -50%);
             font-size: 48px;
             color: #ff0000;
-            display: none; 
-            z-index: 100; /* Increased Z-index */
             text-align: center;
+            display: none; 
+            z-index: 100;
             text-shadow: 2px 2px 0 #000;
         }
 
@@ -118,7 +118,7 @@
                 transition: width 0.1s linear;
             }  
             .midnightbird{
-                width: 40px; /* Increased size slightly for better visibility */
+                width: 40px;
                 height: 40px;
                 background-size: contain;
                 position:absolute;
@@ -169,8 +169,7 @@
             const enemy = document.getElementById('enemy');
             const gameOverText = document.getElementById('gameover');
             const scoreblock = document.getElementById("score");
-            const powerupEl = document.getElementById('powerup');
-            const staminaBar = document.getElementById('staminabar');
+            const powerupEl = document.getElementById('powerup'); // Added
             
             const acceleration = 0.87; // 
             const friction = 0.90;
@@ -214,7 +213,7 @@
 
             document.addEventListener('keydown', (e) => {
                 keys[e.key] = true;
-                keys[e.code] = true;
+                keys[e.code] = true; // Use code for Space
                 
                 // MUSIC FIX: This is the ONLY place we try to start music initially
                 if (!musicHasStarted && !paused) {
@@ -250,6 +249,7 @@
 
             function togglePause() {
                 paused = !paused;
+
                 if (paused) {
                     document.body.classList.remove('hide-cursor');
                     backgroundmusic.pause();
@@ -260,7 +260,7 @@
                     }
                 }
             }
-
+            
             function resetGame() {
                 // Reset positions
                 playerX = window.innerWidth / 2 - 17;
@@ -283,7 +283,7 @@
                 gameOverText.style.display = 'none';
                 document.body.classList.add('hide-cursor');
                 
-                spawninvis(); // Rename to spawnPowerup, but keep original name for now
+                spawninvis(); 
                 
                 if(musicHasStarted && backgroundmusic) {
                     backgroundmusic.currentTime = 0;
@@ -395,7 +395,7 @@
 
             function spawninvis(){
                 const size = 22;
-                let px = Math.random() * (window.innerWidth - size - 50) + 25;
+                let px = Math.random() * (window.innerWidth - size - 50) + 25; // Adjusted range slightly
                 let py = Math.random() * (window.innerHeight - size - 50) + 25;
                 const powerup = document.getElementById('powerup');
                 powerup.style.left = px + "px";
@@ -490,11 +490,12 @@
                 const pRect = player.getBoundingClientRect();
                 const enemyRect = enemy.getBoundingClientRect(); 
 
-                const overlap = !(pRect.right < enemyRect.left || 
+                const enemyOverlap = !(pRect.right < enemyRect.left || 
                                   pRect.left > enemyRect.right || 
                                   pRect.bottom < enemyRect.top || 
                                   pRect.top > enemyRect.bottom);
-                if (overlap && !invis) {
+                
+                if (enemyOverlap && !invis) {
                     gameOverText.style.display = 'block';
                     running = false;
                     backgroundmusic.pause(); 
@@ -542,13 +543,11 @@
                 if (!paused) {
                     movePlayer();
                     moveEnemy();
-                    
-                    // Collision check now handles both enemy and powerup
-                    collisiondetection(); 
+                    collisiondetection();
 
                     // Update stamina bar
                     stamina = Math.min(maxStamina, stamina + staminarate);
-                    staminaBar.style.width = (stamina / maxStamina * 100) + '%';
+                    document.getElementById('staminabar').style.width = (stamina / maxStamina * 100) + '%';
                 }
 
                 requestAnimationFrame(gameLoop);
