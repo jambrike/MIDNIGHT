@@ -49,9 +49,34 @@
 </head>
 <body>
     <div class="menu-container">
-        <a class href="oneplayer.html"><div class="menu-button">EINS player(1)</div></a>
-        <a class href="twoplayer.html"><div class="menu-button">ZWEI player(2)</div></a>
-        </div>
+        <a href="oneplayer.html"><div class="menu-button">EINS player(1)</div></a>
+        <a href="twoplayer.html"><div class="menu-button">ZWEI player(2)</div></a>
+    </div>
+    <div id="background-selector">
+        Background:
+        <button onclick="setBackground('bg-default')">Default</button>
+        <button onclick="setBackground('bg-midnight')">Midnight!</button>
+        <button onclick="setBackground('bg-google')">Google</button>
+        <button onclick="setBackground('bg-reddit')">Reddit</button>
+    </div>
+    <script>
+        function setBackground(className){
+            document.body.className =  '';         
+            document.body.classlist.add(className);
+            
+            localStorage.setItem("gameBackground",className)
+        }
+        document.addEventListener("DOMContentLoaded",()=> {
+            const savedBackground = localStorage.getItem('gameBackground');
+            
+            if (savedBackground) {
+                setBackground(savedBackground);
+            } else {
+                setBackground('bg-default');
+            }
+        });
+
+
+    </script>
 </body>
 </html>
-        
