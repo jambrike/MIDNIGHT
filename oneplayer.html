@@ -46,6 +46,10 @@
             background-position: center;
             position:absolute;
         }
+        #gamearea.bg-default {
+         background: #ffffff;
+         background-image: none;
+        }
 
         #enemy {
             width: 32px;
@@ -117,6 +121,21 @@
                 border-radius: 10px;
                 transition: width 0.1s linear;
             }  
+            #gamearea.bg-google{
+                background-image: url(google.png);
+                background-size:cover;
+                background-color: #ffffff;
+            }
+            #gamearea.bg-midnnight{
+                background-image: url(midnightweb.png);
+                background-size:cover;
+                background-color: #ffffff;
+            }
+            #gamearea.bg-reddit{
+                background-image: url(reddit.png);
+                background-size:cover;
+                background-color: #ffffff;
+            }
             .midnightbird{
                 width: 40px;
                 height: 40px;
@@ -209,6 +228,16 @@
 
             let score = 0;
             let keys = {};
+
+            document.addEventListener('DOMContentLoaded', () => {
+            const gameArea = document.getElementById('gamearea');
+            const savedBackground = localStorage.getItem('gameBackground');
+            if (savedBackground) {
+                gameArea.classList.add(savedBackground);
+            } else {
+                gameArea.classList.add('bg-default');
+    }
+});
 
 
             document.addEventListener('keydown', (e) => {
