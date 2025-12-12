@@ -39,7 +39,7 @@
             background: #007bff; 
             position: absolute;
             border-radius: 2px;
-            background-image: url(players1.png);
+            background-image: url(players26.png);
 
             background-repeat: no-repeat;
             background-size: contain;
@@ -57,7 +57,7 @@
             background: #030000;
             position: absolute;
             border-radius: 2px;
-            background-image: url(mouse.png);
+            background-image: url(mouse26.png);
             background-repeat: no-repeat;
             background-size: contain;
             background-position: center;
@@ -93,7 +93,7 @@
             background: #b34eed;
             position: absolute;
             border-radius: 4px;
-            background-image: url(mcpotion.png);
+            background-image: url(mcpotion26.png);
             
             background-repeat: no-repeat;
             background-size: contain;
@@ -192,7 +192,7 @@
             
             const acceleration = 0.87; // 
             const friction = 0.90;
-            const birdFlapFrames = ["wing_up.png", "wing_down.png"]; 
+            const birdFlapFrames = ["wing_up26.png", "wing_down26.png"]; 
 
             document.body.classList.add('hide-cursor');
 
@@ -468,7 +468,7 @@
                 const length = Math.hypot(dashDirX, dashDirY);
                 if (length === 0) return; 
 
-                enemyspeedboost*=0.984;
+                enemyspeedboost*=0.99;
 
                 dashDirX /= length;
                 dashDirY /= length;
@@ -530,7 +530,7 @@
                     backgroundmusic.pause(); 
                     document.body.classList.remove('hide-cursor');
                 }
-                
+                //bassicaly 
                 // POWERUP LOGIC Check
                 if (powerupact){
                     const powerupRect = powerupEl.getBoundingClientRect();
