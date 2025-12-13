@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     spawninvis();
     setInterval(updatescore, 1000);
-    setInterval(hackclubbirdfly, 15000);
+    setInterval(hackclubbirdfly, 4000);//why was it set to fifteen seconds
     requestAnimationFrame(gameLoop);
 });
 
@@ -210,6 +210,7 @@ function movePlayer() {
 }
 //hackclub bird use for homepage too id say got iddea from when people sayed theyd do it with em what ya call it like for desktop
 function hackclubbirdfly() {
+    console.log("HACK CLUB BIRD FUNCTION EXECUTED");// test is if it shows up or wtv
     if(paused || !running) return;
 
     const bird = document.createElement("div");
@@ -433,7 +434,7 @@ function updatescore(){
     
     // Difficulty increase
     if (score % 5 === 0){ 
-        enemyspeedboost += 0.05; 
+        enemyspeedboost += 0.06; 
     }
 }
 
