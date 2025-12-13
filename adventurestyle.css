@@ -4,7 +4,7 @@ body{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     overflow: hidden; 
 }
-*/*dont need right image anymore*/*
+*/*dont need right image anymore*/
 body.hide-cursor {
     cursor: none;
 }
@@ -79,6 +79,19 @@ body.hide-cursor {
     background-size: contain;
     background-position: center;
     position:absolute;
+    display:none;
+}
+#portalvid{
+    position: fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vw;
+    object-fit:cover;
+    z-index:24;
+
+}/*cant make it show up*/
+#portalhidden{
     display:none;
 }
 
