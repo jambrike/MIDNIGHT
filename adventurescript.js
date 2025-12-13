@@ -176,7 +176,8 @@ function  changethebackg(){
     const currentclass = backgrounds[currentbackgroundindex];
 
     gameA.classList.remove(currentclass);
-    currentbackgroundindex =  (currentbackgroundindex+1);
+    //turns out have to use some modulo wtv the hell that means
+    currentbackgroundindex =  (currentbackgroundindex+1)% backgrounds.length;
     const newclass =backgrounds[currentbackgroundindex];
     gameA.classList.add(newclass);
     localStorage.setItem("gameBackground", newclass);
@@ -192,6 +193,8 @@ function startportal(){
 
     //show it
     portalvid.classList.remove("portalhidden");
+    //some mistake here
+    portalvid.currentTime =0;
     portalvid.onload();
     portalvid.play().catch(e => console.log("Video playback blocked:",e));
 }
