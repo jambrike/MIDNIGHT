@@ -1,0 +1,131 @@
+body{
+    margin:0;
+    background: #f2f2f2;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    overflow: hidden; 
+}
+//dont need right imag anymore 
+body.hide-cursor {
+    cursor: none;
+}
+
+#gamearea {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+#player {
+    width: 35px;
+    height: 35px; 
+    position: absolute;
+    border-radius: 2px;
+    background-image: url(players26.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    position:absolute;
+}
+#gamearea.bg-default {
+    background: #ffffff;
+    background-image: none;
+}
+
+#enemy {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    border-radius: 2px;
+    background-image: url(mouse26.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    position:absolute;
+}
+#gameover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: #ff0000;
+    text-align: center;
+    display: none; 
+    z-index: 100;
+    text-shadow: 2px 2px 0 #000;
+}
+
+#score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 24px;
+    color: #333333;
+    padding: 5px 10px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 5px;
+    z-index: 5;
+}
+#powerup {
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    border-radius: 4px;
+    background-image: url(mcpotion26.png);
+    
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    position:absolute;
+    display:none;
+}
+
+#outsidestaminabar{
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 20px;
+    background: #555555;
+    border-radius: 10px;
+    z-index: 10;
+}
+#staminabar{
+    width: 100%;
+    height: 100%;
+    background: #5b20fe91;
+    border-radius: 10px;
+    transition: width 0.1s linear;
+}  
+#gamearea.bg-google{
+    background-image: url(google.png);
+    background-size:cover;
+    background-color: #ffffff;
+}
+#gamearea.bg-midnnight{
+    background-image: url(midnightw.png);
+    background-size:cover;
+    background-color: #ffffff;
+}
+#gamearea.bg-reddit{
+    background-image: url(reddit.png);
+    background-size: cover;
+
+    background-color: #ffffff;
+}
+
+ note move homepage>
+
+.midnightbird{
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+    position:absolute;
+    background-repeat: no-repeat
+    ;
+    z-index: 8;
+    transition:left 4s linear;
+}
