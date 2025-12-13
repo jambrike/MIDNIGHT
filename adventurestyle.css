@@ -4,7 +4,7 @@ body{
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     overflow: hidden; 
 }
-//dont need right imag anymore 
+*/*dont need right image anymore*/*
 body.hide-cursor {
     cursor: none;
 }
@@ -117,15 +117,16 @@ body.hide-cursor {
     background-color: #ffffff;
 }
 
- note move homepage>
+ /*move that to homepage laterr*/
 
 .midnightbird{
+    position: absolute; 
     width: 40px;
     height: 40px;
     background-size: contain;
-    position:absolute;
-    background-repeat: no-repeat
-    ;
+    background-position: center; 
+    background-repeat: no-repeat;
+    transition: left 4s linear;
+    
     z-index: 8;
-    transition:left 4s linear;
 }
