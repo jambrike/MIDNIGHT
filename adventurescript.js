@@ -14,7 +14,17 @@ const player = document.getElementById('player');
 const enemy = document.getElementById('enemy');
 const gameOverText = document.getElementById('gameover');
 const scoreblock = document.getElementById("score");
-const powerupEl = document.getElementById('powerup'); // Added
+const powerupEl = document.getElementById('powerup'); 
+const portalvid = document.getElementById(portalvid)
+const backgrounds=[
+    "bg-google",
+    "bg-midnnight",
+    "bg-reddit"
+
+];
+let currentbackgroundindex = 0;
+
+
 
 const acceleration = 0.87; // 
 const friction = 0.90;
@@ -162,8 +172,49 @@ function resetGame() {
     
     requestAnimationFrame(gameLoop);
 }
+function  changethebackg(){
+    const currentclass = backgrounds[currentbackgroundindex];
+
+    gameA.classList.remove(currentclass);
+    currentbackgroundindex =  (currentbackgroundindex+1);
+    const newclass =backgrounds[currentbackgroundindex];
+    gameA.classList.add(newclass);
+    localStorage.setItem("gameBackground", newclass);
+}
+function startportal(){
+    paused = true;
+    backgroundmusic.pause();
+    document.body.classList.remove("hide-cursor");
+
+    player.style.display = "none";
+    enemy.style.display="none";
+    powerupEl.style.display = "none";
+
+    //show it
+    portalvid.classList.remove("portalhidden");
+    portalvid.onload();
+    portalvid.play().catch(e => console.log("Video playback blocked:",e));
+}
+    portalvid.addEventListener("ended",() => {
+        changethebackg();
+        score +=99;
+        scoreblock.textContent = "score:"+ score;
+        stamina=maxStamina;
+        //so then i hide away the vid
+        portalvid.classList.add("portal-hidden");
+        player.style.display = "block";
+        enemy.style.display = "block";//power up naturally comes in or somethin
+//start it bakc uo again
+        paused = false;
+        document.body.classList.add("hide-cursor")
+        if (musicHasStarted){
+            backgroundmusic.play();
+        }
+
+;
 
 
+    });
 function startBirdFlapCycle(birdElement) {
     let frameIndex = 0;
     
@@ -454,20 +505,13 @@ if (!running) return;
     requestAnimationFrame(gameLoop);
  }
  function triggerBirdEffect(bird){
-
+bird.dataset.hit = true;
     bird.style.transition = "transform 0.35s, opacity 0.35s"
     bird.style.transform += "rotate(720deg) scale(1.5)";
-    bird.style.opacity = "0";
-    score += 50;
-    scoreblock.textContent = "Score: " + score;
-    stamina = maxStamina; 
+    bird.style.opacity = "0"; 
     
-    // 3. Visual feedback on score
-    scoreblock.style.backgroundColor = "gold";
-    setTimeout(() => {
-        scoreblock.style.backgroundColor = "rgba(255, 255, 255, 0.7)";
-    }, 500);
-
+    // feedback on score get rid of for video thing
+    startportal();
     pickup.currentTime = 0;
     pickup.play().catch(e => {});
 }
