@@ -44,6 +44,20 @@ body.hide-cursor {
     background-position: center;
     position:absolute;
 }
+#enemy2{
+    display: none;
+    width:32px;
+    position:absolute;
+    height:32px;
+    border-radius: 2px;
+    background-image: url(mouse26.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+
+
 #gameover {
     position: absolute;
     top: 50%;
