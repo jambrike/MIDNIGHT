@@ -75,10 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         gameArea.classList.remove(...backgrounds,"bg-default");
         gameArea.classList.add("bg-google");
         currentbackgroundindex=0;
-    } else {
-        gameArea.classList.add('bg-default');
-    }
-    
     // Initial setup for positions before gameLoop starts
     playerX = window.innerWidth / 2 - 17;
     playerY = window.innerHeight / 2 - 17;
