@@ -81,7 +81,7 @@ body.hide-cursor {
     position:absolute;
     display:none;
 }
-#portalvid{
+.portalvid{
     position: fixed;
     top:0;
     left:0;
