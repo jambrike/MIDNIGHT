@@ -195,7 +195,6 @@ function startportal(){
     portalvid.classList.remove("portalhidden");
     //some mistake here
     portalvid.currentTime =0;
-    portalvid.onload();
     portalvid.play().catch(e => console.log("Video playback blocked:",e));
 }
     portalvid.addEventListener("ended",() => {
