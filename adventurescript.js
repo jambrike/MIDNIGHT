@@ -191,11 +191,18 @@ function startportal(){
     enemy.style.display="none";
     powerupEl.style.display = "none";
 
-    //show it
     portalvid.classList.remove("portalhidden");
-    //some mistake here
-    portalvid.currentTime =0;
-    portalvid.play().catch(e => console.log("Video playback blocked:",e));
+    portalvid.currentTime = 0;
+
+    function playVideoOnce() {
+        portalvid.play().catch(e => {
+            console.error("Video playback failed:", e);
+            setTimeout(portalvid.onended, 1500); 
+        });
+        portalvid.removeEventListener('loadeddata', playVideoOnce);
+    }
+    portalvid.addEventListener('loadeddata', playVideoOnce);
+    portalvid.load();
 }
     portalvid.addEventListener("ended",() => {
         changethebackg();
