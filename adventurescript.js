@@ -210,7 +210,7 @@ function startportal(){
         scoreblock.textContent = "score:"+ score;
         stamina=maxStamina;
         //so then i hide away the vid
-        portalvid.classList.add("portal-hidden");
+        portalvid.classList.add("portalhidden");
         player.style.display = "block";
         enemy.style.display = "block";//power up naturally comes in or somethin
 //start it bakc uo again
@@ -408,82 +408,63 @@ function usepowerup() {
     } , 1450);
 }
 //collision stuff
-function collisiondetection(){
-    const pRect = player.getBoundingClientRect();
-    const enemyRect = enemy.getBoundingClientRect(); 
+function collisiondetection() {
+  const pRect = player.getBoundingClientRect();
+  const enemyRect = enemy.getBoundingClientRect();
 
-    // --- ENEMY COLLISION ---
-    const enemyOverlap = !(pRect.right < enemyRect.left || 
-                      pRect.left > enemyRect.right || 
-                      pRect.bottom < enemyRect.top || 
-                      pRect.top > enemyRect.bottom);
-    
-    if (enemyOverlap && !invis) {
-        gameOverText.style.display = 'block';
-        running = false;
-        backgroundmusic.pause(); 
-        document.body.classList.remove('hide-cursor');
+  // enemy collision
+  const enemyOverlap = !(
+    pRect.right < enemyRect.left ||
+    pRect.left > enemyRect.right ||
+    pRect.bottom < enemyRect.top ||
+    pRect.top > enemyRect.bottom
+  );
+
+  if (enemyOverlap && !invis) {
+    gameOverText.style.display = "block";
+    running = false;
+    backgroundmusic.pause();
+    document.body.classList.remove("hide-cursor");
+    return;
+  }
+  if (powerupact) {
+    const powerupRect = powerupEl.getBoundingClientRect();
+
+    const puOverlap = !(
+      pRect.right < powerupRect.left ||
+      pRect.left > powerupRect.right ||
+      pRect.bottom < powerupRect.top ||
+      pRect.top > powerupRect.bottom
+    );
+
+    if (puOverlap) {
+      usepowerup();
+      powerupEl.style.display = "none";
+      powerupact = false;
+
+      pickup.currentTime = 0;
+      pickup.play().catch(() => {});
+
+      setTimeout(spawninvis, 7000);
     }
-    
-    // --- POWERUP COLLISION ---
-    if (powerupact){
-        const powerupRect = powerupEl.getBoundingClientRect();
+  }
+  //check if collided with bird through hit datasert
+  const bird = document.querySelector(".midnightbird");
+  if (bird) {
+    const birdRect = bird.getBoundingClientRect();
+    const birdOverlap = !(
+      pRect.right < birdRect.left ||
+      pRect.left > birdRect.right ||
+      pRect.bottom < birdRect.top ||
+      pRect.top > birdRect.bottom
+    );
 
-        const puOverlap = !(pRect.right < powerupRect.left || 
-                          pRect.left > powerupRect.right || 
-                          pRect.bottom < powerupRect.top || 
-                          pRect.top > powerupRect.bottom);
-        
-        if (puOverlap) {
-            usepowerup();
-            powerupEl.style.display = 'none';
-            powerupact = false;
-            
-            pickup.currentTime = 0;
-            pickup.play().catch(e => console.log("Sound error"));
-            
-            setTimeout(spawninvis, 7000); 
-        }
+    if (birdOverlap && !bird.dataset.hit) {
+      bird.dataset.hit = "true";
+      triggerBirdEffect(bird);
     }
-
-    const bird = document.querySelector('.midnightbird');
-    
-    if (bird) {
-        const birdRect = bird.getBoundingClientRect();
-        
-        const birdOverlap = !(pRect.right < birdRect.left || 
-                              pRect.left > birdRect.right || 
-                              pRect.bottom < birdRect.top || 
-                              pRect.top > birdRect.bottom);
-
-        if (birdOverlap && !bird.dataset.hit) {
-            bird.dataset.hit = "true"; //  so code runs once
-            triggerBirdEffect(bird);
-        }
-    }
+  }
 }
-            
-    //bassicaly 
-    // POWERUP LOGIC Check
-    if (powerupact){
-        const powerupRect = powerupEl.getBoundingClientRect();
-
-        const puOverlap = !(pRect.right < powerupRect.left || 
-                          pRect.left > powerupRect.right || 
-                          pRect.bottom < powerupRect.top || 
-                          pRect.top > powerupRect.bottom);
-        
-        if (puOverlap) {
-            usepowerup();
-            powerupEl.style.display = 'none';
-            powerupact = false;
-            
-            pickup.currentTime = 0;
-            pickup.play().catch(e => console.log("Sound error"));
-            
-            setTimeout(spawninvis, 7000); 
-        }
-    }
 
 
 function updatescore(){
