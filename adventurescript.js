@@ -23,6 +23,12 @@ const backgrounds=[
     "bg-reddit"
 
 ];
+const minimum_enemydist=90;
+const repel =0.6;
+const safetynet =180;
+
+
+
 let currentbackgroundindex = 0;
 
 
@@ -75,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameArea.classList.remove(...backgrounds,"bg-default");
         gameArea.classList.add("bg-google");
         currentbackgroundindex=0;
+    
     // Initial setup for positions before gameLoop starts
     playerX = window.innerWidth / 2 - 17;
     playerY = window.innerHeight / 2 - 17;
@@ -178,6 +185,36 @@ function resetGame() {
     
     requestAnimationFrame(gameLoop);
 }
+function keepapart(){
+    if(level < 2)return;
+    const dx= enemy2X-enemyX;
+    const dy = enemy2Y-enemyY
+    const dist = Math.hypot(dx,dy);
+    if (dist===0) return;
+
+if (dist < minimum_enemydist) {
+    const overlap = minimum_enemydist - dist;
+    const nx = dx / dist;
+    const ny = dy / dist;
+
+    enemyX  -= nx * overlap * 0.5 * repel;
+    enemyY  -= ny * overlap * 0.5 * repel;
+    enemy2X += nx * overlap * 0.5 * repel;
+    enemy2Y += ny * overlap * 0.5 * repel;
+    //still keep inside as usua
+    enemyX  = Math.max(0, Math.min(enemyX,  window.innerWidth  - 32));
+    enemyY  = Math.max(0, Math.min(enemyY,  window.innerHeight - 32));
+    enemy2X = Math.max(0, Math.min(enemy2X, window.innerWidth  - 32));
+    enemy2Y = Math.max(0, Math.min(enemy2Y, window.innerHeight - 32));
+
+     enemy.style.left  = enemyX + "px";
+    enemy.style.top   = enemyY + "px";
+    enemy2.style.left = enemy2X + "px";
+    enemy2.style.top  = enemy2Y + "px";
+
+
+}
+}
 function  changethebackg(){
     const currentclass = backgrounds[currentbackgroundindex];
 
@@ -187,6 +224,38 @@ function  changethebackg(){
     const newclass =backgrounds[currentbackgroundindex];
     gameA.classList.add(newclass);
 }
+function safetynetaway(isEnemy2){
+    const ex = isEnemy2 ? enemy2X:enemyX;
+    const ey = isEnemy2 ? enemy2Y:enemyY;
+
+    const dx = ex - playerX;
+  const dy = ey - playerY;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist === 0) return;
+
+  if (dist < safetynet) {
+    const need = safetynet- dist;
+    const nx = dx / dist;
+    const ny = dy / dist;
+
+    const newX = ex + nx * need;
+    const newY = ey + ny * need;
+
+    if (isEnemy2) {
+      enemy2X = Math.max(0, Math.min(newX, window.innerWidth - 32));
+      enemy2Y = Math.max(0, Math.min(newY, window.innerHeight - 32));
+      enemy2.style.left = enemy2X + "px";
+      enemy2.style.top  = enemy2Y + "px";
+    } else {
+      enemyX = Math.max(0, Math.min(newX, window.innerWidth - 32));
+      enemyY = Math.max(0, Math.min(newY, window.innerHeight - 32));
+      enemy.style.left = enemyX + "px";
+      enemy.style.top  = enemyY + "px";
+    }
+  }
+}
+
 function startportal(){
     paused = true;
     backgroundmusic.pause();
@@ -215,11 +284,14 @@ function startportal(){
         changethebackg();
         score +=99;
         level += 1;
-        if(level ===2){
+        if(level >= 2){
             enemy2.style.display="block";
             e2Velx=0;
             e2Vely= 0;
             spawnenemy2();
+            safetynetaway(false);
+            if (level>=2)safetynetaway(true);
+            keepapart();
         }
         scoreblock.textContent = "score:"+ score;
         stamina=maxStamina;
@@ -563,8 +635,11 @@ if (!running) return;
  if(!paused){
     movePlayer();
     if(level>=2) moveEnemy2();
-        moveEnemy();
-        collisiondetection();
+    
+    moveEnemy();
+
+    keepapart();
+    collisiondetection();
 
         // Update stamina bar
         stamina = Math.min(maxStamina, stamina + staminarate);
@@ -583,5 +658,4 @@ bird.dataset.hit = true;
     startportal();
     pickup.currentTime = 0;
     pickup.play().catch(e => {});
-}
-// Start
+                               }
