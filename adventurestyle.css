@@ -81,17 +81,16 @@ body.hide-cursor {
     position:absolute;
     display:none;
 }
-.portalvid{
-    position: fixed;
-    top:0;
-    left:0;
-    width:100vw;
-    height:100vw;
-    object-fit:cover;
-    z-index:24;
-
+#portalvid{
+  position: fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  object-fit:cover;
+  z-index:24;
 }/*cant make it show up*/
-#portalhidden{
+.portalhidden{
     display:none;
 }
 
