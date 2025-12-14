@@ -12,6 +12,7 @@ let musicHasStarted = false;
 const gameA = document.getElementById('gamearea');
 const player = document.getElementById('player');
 const enemy = document.getElementById('enemy');
+const enemy2 = document.getElementById("enemy2");
 const gameOverText = document.getElementById('gameover');
 const scoreblock = document.getElementById("score");
 const powerupEl = document.getElementById('powerup'); 
@@ -34,11 +35,14 @@ document.body.classList.add('hide-cursor');
 
 let playerX = 200, playerY = 200;
 let enemyX = 600, enemyY = 600;
+let enemy2X = 0 , enemy2Y = 0;
 
 let pVelx = 0, pVely = 0;
 let eVelx = 0, eVely = 0;
+let e2Velx=0, e2Vely=0;
 let enemyAcceleration = 0.7;
 let enemyFriction = 0.92; // 
+let level = 1;
 
 // Dash variables
 let dashPower = 15;
@@ -53,7 +57,6 @@ let paused = false;
 let enemyspeedboost = 1;
 let running = true;
 
-// Powerup variables
 let powerupact = false;
 let invis = false;
 
@@ -67,9 +70,11 @@ let keys = {};
 
 document.addEventListener('DOMContentLoaded', () => {
     const gameArea = document.getElementById('gamearea');
-    const savedBackground = localStorage.getItem('gameBackground');
-    if (savedBackground) {
-        gameArea.classList.add(savedBackground);
+    level = 1;
+    enemy2.style.display = "none";
+        gameArea.classList.remove(...backgrounds,"bg-default");
+        gameArea.classList.add("bg-google");
+        currentbackgroundindex=0;
     } else {
         gameArea.classList.add('bg-default');
     }
@@ -150,12 +155,17 @@ function resetGame() {
 
     // Reset state/stats
     pVelx = 0; pVely = 0; eVelx = 0; eVely = 0;
+    e2Velx=0; e2Vely=0;
     score = 0;
     scoreblock.textContent = "Score: 0";
     enemyspeedboost = 1;
     stamina = maxStamina;
     invis = false;
     player.style.opacity = "1";
+    level = 1;
+    enemy2.style.display="none";
+
+
 
     // Reset visuals/flow
     running = true;
@@ -175,12 +185,11 @@ function resetGame() {
 function  changethebackg(){
     const currentclass = backgrounds[currentbackgroundindex];
 
-    gameA.classList.remove(currentclass);
+    gameA.classList.remove(...backgrounds,"bg-default");
     //turns out have to use some modulo wtv the hell that means
     currentbackgroundindex =  (currentbackgroundindex+1)% backgrounds.length;
     const newclass =backgrounds[currentbackgroundindex];
     gameA.classList.add(newclass);
-    localStorage.setItem("gameBackground", newclass);
 }
 function startportal(){
     paused = true;
@@ -189,7 +198,9 @@ function startportal(){
 
     player.style.display = "none";
     enemy.style.display="none";
+    enemy2.style.display="none"
     powerupEl.style.display = "none";
+
 
     portalvid.classList.remove("portalhidden");
     portalvid.currentTime = 0;
@@ -207,6 +218,13 @@ function startportal(){
     portalvid.addEventListener("ended",() => {
         changethebackg();
         score +=99;
+        level += 1;
+        if(level ===2){
+            enemy2.style.display="block";
+            e2Velx=0;
+            e2Vely= 0;
+            spawnenemy2();
+        }
         scoreblock.textContent = "score:"+ score;
         stamina=maxStamina;
         //so then i hide away the vid
@@ -268,6 +286,23 @@ function movePlayer() {
     player.style.left = playerX + "px";
     player.style.top = playerY + "px";
 }
+function spawnenemy2(){
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const margin = 100;
+
+  // opposite side of the PLAYER
+  enemy2X = (playerX < w/2) ? (w - margin) : margin;
+  enemy2Y = (playerY < h/2) ? (h - margin) : margin;
+
+  enemy2X = Math.max(0, Math.min(enemy2X, w - 32));
+  enemy2Y = Math.max(0, Math.min(enemy2Y, h - 32));
+
+  enemy2.style.left = enemy2X + "px";
+  enemy2.style.top  = enemy2Y + "px";
+}
+
+
 //hackclub bird use for homepage too id say got iddea from when people sayed theyd do it with em what ya call it like for desktop
 function hackclubbirdfly() {
     console.log("HACK CLUB BIRD FUNCTION EXECUTED");// test is if it shows up or wtv
@@ -398,6 +433,35 @@ function moveEnemy() {
     enemy.style.left = enemyX + "px";
     enemy.style.top = enemyY + "px";
 }
+function moveEnemy2() {
+    const dx = playerX - enemy2X;
+    const dy = playerY - enemy2Y;
+    const angle = Math.atan2(dy,dx);
+
+    e2Velx += Math.cos(angle) * enemyAcceleration * enemyspeedboost;
+    e2Vely += Math.sin(angle) * enemyAcceleration * enemyspeedboost;
+    
+    e2Velx *= enemyFriction;
+    e2Vely *= enemyFriction;
+    enemy2X += e2Velx;
+    enemy2Y += e2Vely;
+
+    enemy2.style.left = enemy2X + "px";
+    enemy2.style.top = enemy2Y + "px";
+    //copy in wander thing for him aswell
+    if(invis){
+        enemy2X +=(Math.random()-0.5)*4
+         enemy2Y+=(Math.random()-0.5)*4
+
+         enemy2X =Math.max(0,Math.min(enemy2X,window.innerWidth-32))
+         enemy2Y =Math.max(0,Math.min(enemy2Y,window.innerHeight-32))
+
+         enemy2.style.left = enemy2X + "px";
+         enemy2.style.top = enemy2Y + "px";
+
+
+    }
+}
 
 function usepowerup() {
     invis = true;
@@ -419,6 +483,24 @@ function collisiondetection() {
     pRect.bottom < enemyRect.top ||
     pRect.top > enemyRect.bottom
   );
+  if (level>=2){
+    const enemy2Rect = enemy2.getBoundingClientRect()
+;
+  const enemy2overlap = !(
+    pRect.right < enemy2Rect.left ||
+    pRect.left > enemy2Rect.right ||
+    pRect.bottom < enemy2Rect.top ||
+    pRect.top > enemy2Rect.bottom
+  );//bassically make it then so that if overlapped and invis act then all stuff haopens
+  if(enemy2overlap && !invis) {
+    gameOverText.style.display="block";
+    running = false;
+    backgroundmusic.pause();
+    document.body.classList.remove("hide-cursor");
+    return;
+
+  }
+}
 
   if (enemyOverlap && !invis) {
     gameOverText.style.display = "block";
@@ -484,6 +566,7 @@ if (!running) return;
  //dont update if paused
  if(!paused){
     movePlayer();
+    if(level>=2) moveEnemy2();
         moveEnemy();
         collisiondetection();
 
