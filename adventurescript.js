@@ -15,7 +15,7 @@ const enemy = document.getElementById('enemy');
 const gameOverText = document.getElementById('gameover');
 const scoreblock = document.getElementById("score");
 const powerupEl = document.getElementById('powerup'); 
-const portalvid = document.getElementById(portalvid)
+const portalvid = document.getElementById("portalvid")
 const backgrounds=[
     "bg-google",
     "bg-midnnight",
