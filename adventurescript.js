@@ -154,7 +154,13 @@ function togglePause() {
         }
     }
 }
-
+function deathfunction(){
+  running = false;
+  paused = true;         
+  gameOverText.style.display = "block";
+  backgroundmusic.pause();
+  document.body.classList.remove("hide-cursor");
+}
 function resetGame() {
     // Reset positions
     playerX = window.innerWidth / 2 - 17;
@@ -628,14 +634,14 @@ function collisiondetection() {
     pRect.top > enemy2Rect.bottom
   );//bassically make it then so that if overlapped and invis act then all stuff haopens
   if(enemy2overlap && !invis&& !immune) {
-    resetGame();
+deathfunction();
     return;
 
   }
 }
 
   if (enemyOverlap && !invis && !immune) {
-    resetGame();
+    deathfunction();
     return;
   }
   if (powerupact) {
@@ -744,4 +750,4 @@ bird.dataset.hit = true;
     startportal();
     pickup.currentTime = 0;
     pickup.play().catch(e => {});
-}
+                                    }
