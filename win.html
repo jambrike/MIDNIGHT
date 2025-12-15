@@ -1,1 +1,53 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You WON</title>
+  <style>
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#95949487;
+      color:white;
+    }
+    .wrap{
+      width: min(1000px, 92vw);
+      background:#94949487;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 22px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+      text-align:center;
+    }
+    .wrap img{
+      width:100%;
+      height:auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+      display:block;
+      margin:0 auto;
+    }
+    .hint{
+      margin-top: 14px;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <img src="youwon.png" alt="win">
+    <div class="hint">Press Space to go homepage!</div>
+    <div class="hint">If u want to see anymore of my random games here's my <a class="link" href="https://instagram.com/james_os08" target="_blank" rel="noopener">instagram</a> and here's my <a class="link" href="https://github.com/jambrike" target="_blank" rel="noopener">Github</a> </div>
+  </div>
+  <script>
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
