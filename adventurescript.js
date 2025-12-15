@@ -49,6 +49,8 @@ let e2Velx=0, e2Vely=0;
 let enemyAcceleration = 0.7;
 let enemyFriction = 0.92; // 
 let level = 1;
+//chuck in spped mutlply aswell
+let speedmult = 1;
 
 // Dash variables
 let dashPower = 15;
@@ -73,6 +75,7 @@ let wandertime = 0;
 
 let score = 0;
 let keys = {};
+let immune=false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const gameArea = document.getElementById('gamearea');
@@ -331,10 +334,10 @@ function startBirdFlapCycle(birdElement) {
 // where the f the function
 
 function movePlayer() {
-    if (keys['ArrowUp']) pVely -= acceleration;
-    if (keys['ArrowDown']) pVely += acceleration;
-    if (keys['ArrowLeft']) pVelx -= acceleration;
-    if (keys['ArrowRight']) pVelx += acceleration;
+    if (keys['ArrowUp']) pVely -= acceleration*speedmult;
+    if (keys['ArrowDown']) pVely += acceleration*speedmult;
+    if (keys['ArrowLeft']) pVelx -= acceleration*speedmult;
+    if (keys['ArrowRight']) pVelx += acceleration*speedmult;
     
     if (paused) return;
 
@@ -560,7 +563,7 @@ function collisiondetection() {
     pRect.bottom < enemy2Rect.top ||
     pRect.top > enemy2Rect.bottom
   );//bassically make it then so that if overlapped and invis act then all stuff haopens
-  if(enemy2overlap && !invis) {
+  if(enemy2overlap && !invis&& immune) {
     gameOverText.style.display="block";
     running = false;
     backgroundmusic.pause();
@@ -570,7 +573,7 @@ function collisiondetection() {
   }
 }
 
-  if (enemyOverlap && !invis) {
+  if (enemyOverlap && !invis && !immune) {
     gameOverText.style.display = "block";
     running = false;
     backgroundmusic.pause();
@@ -649,6 +652,24 @@ if (!running) return;
     requestAnimationFrame(gameLoop);
  }
  function triggerBirdEffect(bird){
+    if(level>=3){
+        speedmult*=1.1;
+        immune= true;
+        //three seconds
+        setTimeout(() =>{
+            immune=false;
+            player.style.boxShadow="none";
+        },3000);
+        bird.dataset.hit="true";
+         bird.style.transition = "transform 0.35s, opacity 0.35s"
+    bird.style.transform += "rotate(720deg) scale(1.5)";
+    bird.style.opacity="0";
+    pickup.currentTime=0;
+    pickup.play().catch(() =>{});
+
+    return;
+    }
+
 bird.dataset.hit = true;
     bird.style.transition = "transform 0.35s, opacity 0.35s"
     bird.style.transform += "rotate(720deg) scale(1.5)";
@@ -658,4 +679,4 @@ bird.dataset.hit = true;
     startportal();
     pickup.currentTime = 0;
     pickup.play().catch(e => {});
-                               }
+}
