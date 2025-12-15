@@ -1,7 +1,5 @@
 # MIDNIGHT
-this is my repository for my first Hack Club project(second submit) and going towards the midnight hackathon in austria. Im basically making a game where your chased around by your own mouse! The main features will be a single and two player mode where you  can play against the ai or you can have you and your friend running away he targets who evers closest so team work makes the dreamwork.
-
-I also plan on adding in an adeventure type of mode where you can run away from the cursor and progress onto new pages of the web. I kinda thought it was good idea from when someone was making a desktop bird that follows you around so i went why i dont i make the bird the portal key to next website.
+this is my repository for my first Hack Club project(second submit) and going towards the midnight hackathon in austria. Im basically making a game where your chased around by your own mouse! The main features will be a single and adventure mode where you can run away from the cursor and progress onto new pages of the web. I kinda thought it was good idea from when someone was making a desktop bird that follows you around so i went why i dont i make the bird the portal key to next website.
 
 some basic game instructions:
 use the arrow keys to move around.
@@ -13,4 +11,4 @@ simple build or deploy instructions.
 it is a simple web page with html css and javascript so you can download or clone the repo and just open the index.html
 it is also being hosted on the web address midknighters.pages.dev
 
-sorry this readme is real long but i just need to make sure im clear and get qualified to go to austria!(i told way to many people to motivate myself to finish the 50 hours)
+spent real long time on this but hopes all is good and get qualified to go to austria!(i told way to many people to motivate myself to finish the 50 hours)
