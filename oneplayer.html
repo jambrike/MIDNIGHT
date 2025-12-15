@@ -363,6 +363,7 @@
                 if (playerY > maxY) { playerY = maxY; pVely *= -0.5; }
                 player.style.left = playerX + "px";
                 player.style.top = playerY + "px";
+                flipcharachter();
             }
             //hackclub bird use for homepage too id say got iddea from when people sayed theyd do it with em what ya call it like for desktop
             function hackclubbirdfly() {
@@ -377,20 +378,14 @@
                 let startX, endX;
 
                 if (isFlyingRight) {
-                    // Flying Left -> Right
+                    // Flying Left go to right
                     startX = -100;
                     endX = window.innerWidth + 100;
-                    
-                    // YOUR IMAGE FACES LEFT.
-                    // To face Right, we must FLIP it (-1).
                     bird.style.transform = "scaleX(-1)"; 
                 } else {
-                    // Flying Right -> Left
+                    // Flying Right go to left
                     startX = window.innerWidth + 100;
                     endX = -100;
-                    
-                    // YOUR IMAGE FACES LEFT.
-                    // To face Left, we keep it normal (1).
                     bird.style.transform = "scaleX(1)"; 
                 }
 
@@ -416,8 +411,12 @@
 
 
             // Start the loop
-            setInterval(hackclubbirdfly, 15000);
-            
+            setInterval(hackclubbirdfly, 6000);
+
+            function flipcharachter(){
+  if (pVelx > 0.2) player.style.transform = "scaleX(1)";
+  else if (pVelx < -0.2) player.style.transform = "scaleX(-1)";
+}
 
             function spawninvis(){
                 const size = 22;
