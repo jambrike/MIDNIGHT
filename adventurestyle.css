@@ -137,14 +137,24 @@ body.hide-cursor {
     background-color: #ffffff;
 }
 #gamearea.bg-reddit{
-    background-image: url(reddit.png);
+    background-image: url(homepage.png);
     background-size: cover;
 
     background-color: #ffffff;
 }
 
  /*move that to homepage laterr*/
-
+.keydrop{
+  width: 22px;               
+  height: 22px;
+  position: absolute;
+  background-image: url("key.png"); 
+  background-size: contain;          
+  background-position: center;
+  z-index: 58;
+  pointer-events: none;    
+  background-repeat: no-repeat;
+}
 .midnightbird{
     position: absolute; 
     width: 40px;
