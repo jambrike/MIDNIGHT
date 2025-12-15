@@ -26,6 +26,9 @@ const backgrounds=[
 const minimum_enemydist=90;
 const repel =0.6;
 const safetynet =180;
+const tokens=6;
+let keycollected =0;
+let keydrops=[]
 
 
 
@@ -170,6 +173,15 @@ function resetGame() {
     player.style.opacity = "1";
     level = 1;
     enemy2.style.display="none";
+    clearKeys();
+    keycollected = 0;
+    speedmult = 1;
+   immune = false;
+
+    gameA.classList.remove(...backgrounds, "bg-default");
+    gameA.classList.add("bg-google");
+    currentbackgroundindex = 0;
+
 
 
 
@@ -215,8 +227,31 @@ if (dist < minimum_enemydist) {
     enemy2.style.left = enemy2X + "px";
     enemy2.style.top  = enemy2Y + "px";
 
-
 }
+}
+function clearKeys(){
+  keydrops.forEach(k => k.remove());
+  keydrops = [];
+  keycollected = 0;
+}
+function spawnkeys(){
+    clearKeys();
+    const size=14;
+     const padding = 25;
+
+  for (let i = 0; i < tokens; i++){
+    const keyEl = document.createElement("div");
+    keyEl.className = "keydrop";
+
+    const x = padding + Math.random() * (window.innerWidth  - size - padding * 2);
+    const y = padding + Math.random() * (window.innerHeight - size - padding * 2);
+
+    keyEl.style.left = x + "px";
+    keyEl.style.top  = y + "px";
+
+    gameA.appendChild(keyEl);
+    keydrops.push(keyEl);
+  }
 }
 function  changethebackg(){
     const currentclass = backgrounds[currentbackgroundindex];
@@ -296,6 +331,12 @@ function startportal(){
             if (level>=2)safetynetaway(true);
             keepapart();
         }
+        if (level === 3){
+            spawnkeys();
+            } else {
+             clearKeys();
+            }
+
         scoreblock.textContent = "score:"+ score;
         stamina=maxStamina;
         //so then i hide away the vid
@@ -356,6 +397,7 @@ function movePlayer() {
     if (playerY > maxY) { playerY = maxY; pVely *= -0.5; }
     player.style.left = playerX + "px";
     player.style.top = playerY + "px";
+    flipcharachter();
 }
 function spawnenemy2(){
   const w = window.innerWidth;
@@ -542,6 +584,28 @@ function usepowerup() {
         player.style.opacity = "1";
     } , 1450);
 }
+function checkkeys(){
+    if(level !==3) return;
+    const p=player.getBoundingClientRect();
+    for (let i = keydrops.length - 1; i>=0; i--){
+    const k = keydrops[i].getBoundingClientRect();
+    const hit = !(
+        p.right<k.left|| p.left>k.right||
+        p.bottom<k.top||p.top>k.bottom
+    );
+    if(hit){
+        keydrops[i].remove();
+        keydrops.splice(i,1);
+        keycollected++;
+
+        pickup.currentTime= 0 ;
+        pickup.play().catch(()=>{})
+    }
+    }
+    if (keycollected>= tokens){
+        window.location.href ="win.html";
+    }
+}
 //collision stuff
 function collisiondetection() {
   const pRect = player.getBoundingClientRect();
@@ -563,21 +627,15 @@ function collisiondetection() {
     pRect.bottom < enemy2Rect.top ||
     pRect.top > enemy2Rect.bottom
   );//bassically make it then so that if overlapped and invis act then all stuff haopens
-  if(enemy2overlap && !invis&& immune) {
-    gameOverText.style.display="block";
-    running = false;
-    backgroundmusic.pause();
-    document.body.classList.remove("hide-cursor");
+  if(enemy2overlap && !invis&& !immune) {
+    resetGame();
     return;
 
   }
 }
 
   if (enemyOverlap && !invis && !immune) {
-    gameOverText.style.display = "block";
-    running = false;
-    backgroundmusic.pause();
-    document.body.classList.remove("hide-cursor");
+    resetGame();
     return;
   }
   if (powerupact) {
@@ -619,6 +677,11 @@ function collisiondetection() {
   }
 }
 
+//shoulda added this earlier
+function flipcharachter(){
+  if (pVelx > 0.2) player.style.transform = "scaleX(1)";
+  else if (pVelx < -0.2) player.style.transform = "scaleX(-1)";
+}
 
 function updatescore(){
     if(paused || !running) return;
@@ -637,6 +700,8 @@ if (!running) return;
  //dont update if paused
  if(!paused){
     movePlayer();
+    checkkeys();
+
     if(level>=2) moveEnemy2();
     
     moveEnemy();
