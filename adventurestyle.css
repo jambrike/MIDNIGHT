@@ -148,7 +148,7 @@ body.hide-cursor {
   width: 22px;               
   height: 22px;
   position: absolute;
-  background-image: url("key.png"); 
+  background-image: url(key.png); 
   background-size: contain;          
   background-position: center;
   z-index: 58;
